@@ -24,6 +24,15 @@ type Race struct {
 	RaceDate pgtype.Date
 }
 
+type Result struct {
+	ID       int32
+	RaceID   int32
+	DriverID int32
+	TeamID   int32
+	Position int32
+	Points   float64
+}
+
 type Season struct {
 	ID         int32
 	SeasonYear int32
