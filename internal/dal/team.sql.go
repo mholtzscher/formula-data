@@ -20,3 +20,27 @@ func (q *Queries) GetTeam(ctx context.Context, id int32) (Team, error) {
 	err := row.Scan(&i.ID, &i.TeamName, &i.Base)
 	return i, err
 }
+
+const listTeams = `-- name: ListTeams :many
+SELECT id, team_name, base FROM team ORDER BY id
+`
+
+func (q *Queries) ListTeams(ctx context.Context) ([]Team, error) {
+	rows, err := q.db.Query(ctx, listTeams)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Team
+	for rows.Next() {
+		var i Team
+		if err := rows.Scan(&i.ID, &i.TeamName, &i.Base); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
