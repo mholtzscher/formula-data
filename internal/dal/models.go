@@ -21,3 +21,9 @@ type Season struct {
 	SeasonYear int32
 	Series     string
 }
+
+type Team struct {
+	ID       int32
+	TeamName string
+	Base     string
+}
