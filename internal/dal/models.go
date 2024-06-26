@@ -16,6 +16,14 @@ type Driver struct {
 	DateOfBirth  pgtype.Date
 }
 
+type Race struct {
+	ID       int32
+	SeasonID int32
+	RaceName string
+	Location string
+	RaceDate pgtype.Date
+}
+
 type Season struct {
 	ID         int32
 	SeasonYear int32
