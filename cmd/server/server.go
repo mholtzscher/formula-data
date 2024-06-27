@@ -13,12 +13,12 @@ import (
 	"golang.org/x/net/http2/h2c"
 )
 
-func run() error {
+func main() {
 	ctx := context.Background()
 
 	conn, err := pgx.Connect(ctx, "host=localhost user=postgres password=postgres dbname=formula-data")
 	if err != nil {
-		return err
+		log.Fatal("could not connect to database: ", err)
 	}
 	defer conn.Close(ctx)
 
@@ -34,12 +34,4 @@ func run() error {
 		// Use h2c so we can serve HTTP/2 without TLS.
 		h2c.NewHandler(mux, &http2.Server{}),
 	)
-
-	return nil
-}
-
-func main() {
-	if err := run(); err != nil {
-		log.Fatal(err)
-	}
 }
