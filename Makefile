@@ -13,6 +13,7 @@ help:
 	@echo "  make migration-down"
 	@echo "  make migration-status"
 	@echo "  make sqlc-gen"
+	@echo "  make buf-gen"
 	@echo "  make run"
 
 # Create a new migration
@@ -46,6 +47,11 @@ sqlc-gen:
 run: 
 	go run cmd/server/server.go
 
+# Generate code from the proto files
+.PHONY: buf-gen
+buf-gen:
+	buf generate
+
 # Run all 
 .PHONY: all
-all: migration-up sqlc-gen run
+all: buf-gen migration-up sqlc-gen run

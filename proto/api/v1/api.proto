@@ -1,0 +1,15 @@
+syntax = "proto3";
+package api.v1;
+
+option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
+
+message CreateSeasonRequest {
+  int32 year = 1;
+  string series = 2;
+}
+
+message CreateSeasonResponse {}
+
+service FormulaDataService {
+  rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
+}
