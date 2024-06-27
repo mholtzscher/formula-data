@@ -42,6 +42,10 @@ sqlc-gen:
 	sqlc generate
 
 # Run the server
-.PHONE: run
+.PHONY: run
 run: 
 	go run cmd/server/server.go
+
+# Run all 
+.PHONY: all
+all: migration-up sqlc-gen run
