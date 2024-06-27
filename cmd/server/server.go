@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
@@ -15,7 +16,15 @@ import (
 	"golang.org/x/net/http2/h2c"
 )
 
-var debug = flag.Bool("debug", false, "sets log level to debug")
+var (
+	port      int
+	log_level string
+)
+
+func init() {
+	flag.IntVar(&port, "port", 8080, "port to listen on")
+	flag.StringVar(&log_level, "level", "info", "log level")
+}
 
 func main() {
 	flag.Parse()
@@ -23,9 +32,9 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if *debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
+	// if *debug {
+	// 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	// }
 
 	log.Info().Msg("Starting server...")
 
@@ -45,7 +54,7 @@ func main() {
 	path, handler := apiv1connect.NewFormulaDataServiceHandler(greeter)
 	mux.Handle(path, handler)
 	http.ListenAndServe(
-		"localhost:8080",
+		fmt.Sprintf(":%d", port),
 		// Use h2c so we can serve HTTP/2 without TLS.
 		h2c.NewHandler(mux, &http2.Server{}),
 	)
