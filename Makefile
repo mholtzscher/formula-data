@@ -8,34 +8,40 @@ MIGRATIONS_DIR := sql/migrations
 .PHONY: help
 help:
 	@echo "Usage:"
-	@echo "  make create-migration name=<migration_name>"
-	@echo "  make up"
-	@echo "  make down"
-	@echo "  make status"
-	@echo "  make gen"
+	@echo "  make migration-create name=<migration_name>"
+	@echo "  make migration-up"
+	@echo "  make migration-down"
+	@echo "  make migration-status"
+	@echo "  make sqlc-gen"
+	@echo "  make run"
 
 # Create a new migration
-.PHONY: create-migration
-create-migration:
+.PHONY: migration-create
+migration-create:
 	@if [ -z "$(name)" ]; then echo "Please provide a migration name like this: make create-migration name=your_migration"; exit 1; fi
 	goose -dir $(MIGRATIONS_DIR) create $(name) sql
 
 # Migrate the DB to the most recent version available
-.PHONY: up
-up:
+.PHONY: migration-up
+migration-up:
 	goose -dir $(MIGRATIONS_DIR) $(DB_DRIVER) $(DB_STRING) up
 
 # Roll back the version by 1
-.PHONY: down
-down:
+.PHONY: migration-down
+migration-down:
 	goose -dir $(MIGRATIONS_DIR) $(DB_DRIVER) $(DB_STRING) down
 
 # Display the status of all migrations
-.PHONY: status
-status:
+.PHONY: migration-status
+migration-status:
 	goose -dir $(MIGRATIONS_DIR) $(DB_DRIVER) $(DB_STRING) status
 
 # Generate the code for the SQLC
-.PHONY: gen
-gen:
+.PHONY: sqlc-gen
+sqlc-gen:
 	sqlc generate
+
+# Run the server
+.PHONE: run
+run: 
+	go run cmd/server/server.go
