@@ -52,10 +52,9 @@ func main() {
 	log.Info().Msg("connected to postgres database")
 
 	queries := dal.New(conn)
-	_ = queries
+	fdServer := srvV1.New(queries)
 
 	log.Info().Msg("starting connectrpc")
-	fdServer := &srvV1.FormulaDataServer{}
 	mux := http.NewServeMux()
 	path, handler := apiv1connect.NewFormulaDataServiceHandler(fdServer)
 	mux.Handle(path, handler)
