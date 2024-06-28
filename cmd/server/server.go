@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/mholtzscher/formula-data/gen/api/v1/apiv1connect"
@@ -52,17 +56,39 @@ func main() {
 	log.Info().Msg("connected to postgres database")
 
 	queries := dal.New(conn)
-	fdServer := srvV1.New(queries)
+	fdServer := srvV1.NewFormulaDataServer(queries)
 
-	log.Info().Msg("starting connectrpc")
+	log.Info().Msg("starting server")
 	mux := http.NewServeMux()
 	path, handler := apiv1connect.NewFormulaDataServiceHandler(fdServer)
 	mux.Handle(path, handler)
-	http.ListenAndServe(
-		*listenAddr,
-		// Use h2c so we can serve HTTP/2 without TLS.
-		h2c.NewHandler(mux, &http2.Server{}),
-	)
+
+	srv := &http.Server{
+		Addr: *listenAddr,
+		Handler: h2c.NewHandler(
+			mux,
+			&http2.Server{},
+		),
+		ReadHeaderTimeout: time.Second,
+		ReadTimeout:       5 * time.Minute,
+		WriteTimeout:      5 * time.Minute,
+		MaxHeaderBytes:    8 * 1024, // 8KiB
+	}
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal().Msgf("HTTP listen and serve: %v", err)
+		}
+	}()
+
+	<-signals
+	log.Info().Msg("shutting down server")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal().Msgf("HTTP shutdown: %v", err)
+	}
 }
 
 func setupLogging(logLevel string) {

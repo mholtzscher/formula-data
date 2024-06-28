@@ -5,7 +5,7 @@ import (
 	"github.com/mholtzscher/formula-data/internal/dal"
 )
 
-func New(db *dal.Queries) *FormulaDataServer {
+func NewFormulaDataServer(db *dal.Queries) *FormulaDataServer {
 	return &FormulaDataServer{
 		DB: db,
 	}
