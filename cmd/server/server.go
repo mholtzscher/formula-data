@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -23,6 +24,10 @@ func main() {
 	var (
 		listenAddr = fs.String("listen-addr", "localhost:8080", "listen address")
 		logLevel   = fs.String("log-level", "info", "log level")
+		dbHost     = fs.String("db-host", "localhost", "database host")
+		dbUser     = fs.String("db-user", "postgres", "database user")
+		dbPass     = fs.String("db-pass", "postgres", "database password")
+		dbName     = fs.String("db-name", "formula-data", "database name")
 	)
 	err := ff.Parse(fs, os.Args[1:],
 		ff.WithEnvVarPrefix("FORMULA_DATA"),
@@ -35,22 +40,24 @@ func main() {
 
 	setupLogging(*logLevel)
 
-	log.Info().Msg("starting server")
-
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, "host=localhost user=postgres password=postgres dbname=formula-data")
+	log.Info().Str("host", *dbHost).Str("user", *dbUser).Msg("connecting to database")
+	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s", *dbHost, *dbUser, *dbPass, *dbName)
+	conn, err := pgx.Connect(ctx, connString)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not connect to database")
 	}
 	defer conn.Close(ctx)
+	log.Info().Msg("connected to postgres database")
 
 	queries := dal.New(conn)
 	_ = queries
 
-	greeter := &srvV1.FormulaDataServer{}
+	log.Info().Msg("starting connectrpc")
+	fdServer := &srvV1.FormulaDataServer{}
 	mux := http.NewServeMux()
-	path, handler := apiv1connect.NewFormulaDataServiceHandler(greeter)
+	path, handler := apiv1connect.NewFormulaDataServiceHandler(fdServer)
 	mux.Handle(path, handler)
 	http.ListenAndServe(
 		*listenAddr,
