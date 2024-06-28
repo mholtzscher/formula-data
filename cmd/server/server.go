@@ -33,22 +33,7 @@ func main() {
 		log.Fatal().Err(err).Msg("error parsing flags")
 	}
 
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-
-	switch strings.ToLower(*logLevel) {
-	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	case "fatal":
-		zerolog.SetGlobalLevel(zerolog.FatalLevel)
-	case "panic":
-		zerolog.SetGlobalLevel(zerolog.PanicLevel)
-	}
+	setupLogging(*logLevel)
 
 	log.Info().Msg("starting server")
 
@@ -72,4 +57,23 @@ func main() {
 		// Use h2c so we can serve HTTP/2 without TLS.
 		h2c.NewHandler(mux, &http2.Server{}),
 	)
+}
+
+func setupLogging(logLevel string) {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	switch strings.ToLower(logLevel) {
+	case "debug":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "info":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "warn":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "error":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	case "fatal":
+		zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	case "panic":
+		zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	}
 }
