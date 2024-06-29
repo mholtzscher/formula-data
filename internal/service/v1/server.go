@@ -5,7 +5,7 @@ import (
 	"github.com/mholtzscher/formula-data/internal/dal"
 )
 
-func NewFormulaDataServer(db *dal.Queries) *FormulaDataServer {
+func NewFormulaDataServer(db dal.Querier) *FormulaDataServer {
 	return &FormulaDataServer{
 		DB: db,
 	}
@@ -13,5 +13,5 @@ func NewFormulaDataServer(db *dal.Queries) *FormulaDataServer {
 
 type FormulaDataServer struct {
 	apiv1.UnimplementedFormulaDataServiceHandler
-	DB *dal.Queries
+	DB dal.Querier
 }

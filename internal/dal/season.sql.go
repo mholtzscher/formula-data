@@ -9,6 +9,27 @@ import (
 	"context"
 )
 
+const createSeason = `-- name: CreateSeason :one
+INSERT INTO season 
+(season_year, series)
+VALUES (
+$1, $2
+)
+RETURNING id
+`
+
+type CreateSeasonParams struct {
+	SeasonYear int32
+	Series     string
+}
+
+func (q *Queries) CreateSeason(ctx context.Context, arg CreateSeasonParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createSeason, arg.SeasonYear, arg.Series)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getSeason = `-- name: GetSeason :one
 SELECT id, season_year, series FROM season
 WHERE id = $1 LIMIT 1

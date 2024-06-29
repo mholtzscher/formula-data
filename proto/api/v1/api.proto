@@ -8,7 +8,9 @@ message CreateSeasonRequest {
   string series = 2;
 }
 
-message CreateSeasonResponse {}
+message CreateSeasonResponse {
+  int32 season_id = 1;
+}
 
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}

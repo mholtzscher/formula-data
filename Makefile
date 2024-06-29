@@ -37,7 +37,7 @@ migration-down:
 migration-status:
 	goose -dir $(MIGRATIONS_DIR) $(DB_DRIVER) $(DB_STRING) status
 
-# Generate the code for the SQLC
+# Generate the code for the sqlc
 .PHONY: sqlc-gen
 sqlc-gen:
 	sqlc generate
@@ -52,6 +52,16 @@ run:
 buf-gen:
 	buf generate
 
+# Generate mocks for testing
+.PHONY: mock-gen
+mock-gen:
+	mockery
+
+# Run tests
+.PHONY: test
+test:
+	go test -v ./...
+
 # Run all 
 .PHONY: all
-all: buf-gen migration-up sqlc-gen run
+all: buf-gen migration-up sqlc-gen mock-gen run

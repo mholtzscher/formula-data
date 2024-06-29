@@ -8,3 +8,4 @@ sql:
         package: "dal"
         out: "internal/dal"
         sql_package: "pgx/v5"
+        emit_interface: true
