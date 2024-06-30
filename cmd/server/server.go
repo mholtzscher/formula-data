@@ -12,6 +12,8 @@ import (
 	"syscall"
 	"time"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/validate"
 	"github.com/jackc/pgx/v5"
 	"github.com/mholtzscher/formula-data/gen/api/v1/apiv1connect"
 	"github.com/mholtzscher/formula-data/internal/dal"
@@ -58,10 +60,18 @@ func main() {
 	queries := dal.New(conn)
 	fdServer := srvV1.NewFormulaDataServer(queries)
 
+	validator, err := validate.NewInterceptor()
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not create validation interceptor")
+	}
+
 	log.Info().Msg("starting server")
 	mux := http.NewServeMux()
-	path, handler := apiv1connect.NewFormulaDataServiceHandler(fdServer)
-	mux.Handle(path, handler)
+	mux.Handle(apiv1connect.NewFormulaDataServiceHandler(
+		fdServer,
+		connect.WithInterceptors(validator),
+	),
+	)
 
 	srv := &http.Server{
 		Addr: *listenAddr,

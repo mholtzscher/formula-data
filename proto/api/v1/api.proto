@@ -1,11 +1,16 @@
 syntax = "proto3";
 package api.v1;
 
+import "buf/validate/validate.proto";
+
 option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
 
 message CreateSeasonRequest {
-  int32 year = 1;
-  string series = 2;
+  int32 year = 1 [(buf.validate.field).int32 = {
+    gt: 1900,
+    lte: 2100
+  }];
+  string series = 2 [(buf.validate.field).required = true];
 }
 
 message CreateSeasonResponse {
