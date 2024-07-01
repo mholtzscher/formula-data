@@ -31,7 +31,14 @@ message GetSeasonByIdResponse {
   Season season = 1;
 }
 
+message GetAllSeasonsRequest {}
+
+message GetAllSeasonsResponse {
+  repeated Season seasons = 1;
+}
+
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
   rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
+  rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
 }

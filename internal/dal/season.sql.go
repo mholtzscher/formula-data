@@ -30,6 +30,31 @@ func (q *Queries) CreateSeason(ctx context.Context, arg CreateSeasonParams) (int
 	return id, err
 }
 
+const getAllSeasons = `-- name: GetAllSeasons :many
+SELECT id, season_year, series FROM season
+ORDER BY season_year DESC
+`
+
+func (q *Queries) GetAllSeasons(ctx context.Context) ([]Season, error) {
+	rows, err := q.db.Query(ctx, getAllSeasons)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Season
+	for rows.Next() {
+		var i Season
+		if err := rows.Scan(&i.ID, &i.SeasonYear, &i.Series); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getSeasonById = `-- name: GetSeasonById :one
 SELECT id, season_year, series FROM season
 WHERE id = $1 LIMIT 1

@@ -9,3 +9,8 @@ VALUES (
 $1, $2
 )
 RETURNING id;
+
+-- name: GetAllSeasons :many
+SELECT * FROM season
+ORDER BY season_year DESC;
+

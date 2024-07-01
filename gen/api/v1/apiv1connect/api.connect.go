@@ -39,6 +39,9 @@ const (
 	// FormulaDataServiceGetSeasonByIdProcedure is the fully-qualified name of the FormulaDataService's
 	// GetSeasonById RPC.
 	FormulaDataServiceGetSeasonByIdProcedure = "/api.v1.FormulaDataService/GetSeasonById"
+	// FormulaDataServiceGetAllSeasonsProcedure is the fully-qualified name of the FormulaDataService's
+	// GetAllSeasons RPC.
+	FormulaDataServiceGetAllSeasonsProcedure = "/api.v1.FormulaDataService/GetAllSeasons"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -46,12 +49,14 @@ var (
 	formulaDataServiceServiceDescriptor             = v1.File_api_v1_api_proto.Services().ByName("FormulaDataService")
 	formulaDataServiceCreateSeasonMethodDescriptor  = formulaDataServiceServiceDescriptor.Methods().ByName("CreateSeason")
 	formulaDataServiceGetSeasonByIdMethodDescriptor = formulaDataServiceServiceDescriptor.Methods().ByName("GetSeasonById")
+	formulaDataServiceGetAllSeasonsMethodDescriptor = formulaDataServiceServiceDescriptor.Methods().ByName("GetAllSeasons")
 )
 
 // FormulaDataServiceClient is a client for the api.v1.FormulaDataService service.
 type FormulaDataServiceClient interface {
 	CreateSeason(context.Context, *connect.Request[v1.CreateSeasonRequest]) (*connect.Response[v1.CreateSeasonResponse], error)
 	GetSeasonById(context.Context, *connect.Request[v1.GetSeasonByIdRequest]) (*connect.Response[v1.GetSeasonByIdResponse], error)
+	GetAllSeasons(context.Context, *connect.Request[v1.GetAllSeasonsRequest]) (*connect.Response[v1.GetAllSeasonsResponse], error)
 }
 
 // NewFormulaDataServiceClient constructs a client for the api.v1.FormulaDataService service. By
@@ -76,6 +81,12 @@ func NewFormulaDataServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(formulaDataServiceGetSeasonByIdMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getAllSeasons: connect.NewClient[v1.GetAllSeasonsRequest, v1.GetAllSeasonsResponse](
+			httpClient,
+			baseURL+FormulaDataServiceGetAllSeasonsProcedure,
+			connect.WithSchema(formulaDataServiceGetAllSeasonsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -83,6 +94,7 @@ func NewFormulaDataServiceClient(httpClient connect.HTTPClient, baseURL string, 
 type formulaDataServiceClient struct {
 	createSeason  *connect.Client[v1.CreateSeasonRequest, v1.CreateSeasonResponse]
 	getSeasonById *connect.Client[v1.GetSeasonByIdRequest, v1.GetSeasonByIdResponse]
+	getAllSeasons *connect.Client[v1.GetAllSeasonsRequest, v1.GetAllSeasonsResponse]
 }
 
 // CreateSeason calls api.v1.FormulaDataService.CreateSeason.
@@ -95,10 +107,16 @@ func (c *formulaDataServiceClient) GetSeasonById(ctx context.Context, req *conne
 	return c.getSeasonById.CallUnary(ctx, req)
 }
 
+// GetAllSeasons calls api.v1.FormulaDataService.GetAllSeasons.
+func (c *formulaDataServiceClient) GetAllSeasons(ctx context.Context, req *connect.Request[v1.GetAllSeasonsRequest]) (*connect.Response[v1.GetAllSeasonsResponse], error) {
+	return c.getAllSeasons.CallUnary(ctx, req)
+}
+
 // FormulaDataServiceHandler is an implementation of the api.v1.FormulaDataService service.
 type FormulaDataServiceHandler interface {
 	CreateSeason(context.Context, *connect.Request[v1.CreateSeasonRequest]) (*connect.Response[v1.CreateSeasonResponse], error)
 	GetSeasonById(context.Context, *connect.Request[v1.GetSeasonByIdRequest]) (*connect.Response[v1.GetSeasonByIdResponse], error)
+	GetAllSeasons(context.Context, *connect.Request[v1.GetAllSeasonsRequest]) (*connect.Response[v1.GetAllSeasonsResponse], error)
 }
 
 // NewFormulaDataServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -119,12 +137,20 @@ func NewFormulaDataServiceHandler(svc FormulaDataServiceHandler, opts ...connect
 		connect.WithSchema(formulaDataServiceGetSeasonByIdMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	formulaDataServiceGetAllSeasonsHandler := connect.NewUnaryHandler(
+		FormulaDataServiceGetAllSeasonsProcedure,
+		svc.GetAllSeasons,
+		connect.WithSchema(formulaDataServiceGetAllSeasonsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/api.v1.FormulaDataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case FormulaDataServiceCreateSeasonProcedure:
 			formulaDataServiceCreateSeasonHandler.ServeHTTP(w, r)
 		case FormulaDataServiceGetSeasonByIdProcedure:
 			formulaDataServiceGetSeasonByIdHandler.ServeHTTP(w, r)
+		case FormulaDataServiceGetAllSeasonsProcedure:
+			formulaDataServiceGetAllSeasonsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -140,4 +166,8 @@ func (UnimplementedFormulaDataServiceHandler) CreateSeason(context.Context, *con
 
 func (UnimplementedFormulaDataServiceHandler) GetSeasonById(context.Context, *connect.Request[v1.GetSeasonByIdRequest]) (*connect.Response[v1.GetSeasonByIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.FormulaDataService.GetSeasonById is not implemented"))
+}
+
+func (UnimplementedFormulaDataServiceHandler) GetAllSeasons(context.Context, *connect.Request[v1.GetAllSeasonsRequest]) (*connect.Response[v1.GetAllSeasonsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.FormulaDataService.GetAllSeasons is not implemented"))
 }

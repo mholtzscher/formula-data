@@ -79,6 +79,64 @@ func (_c *MockQuerier_CreateSeason_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
+// GetAllSeasons provides a mock function with given fields: ctx
+func (_m *MockQuerier) GetAllSeasons(ctx context.Context) ([]dal.Season, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllSeasons")
+	}
+
+	var r0 []dal.Season
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]dal.Season, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []dal.Season); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]dal.Season)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockQuerier_GetAllSeasons_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllSeasons'
+type MockQuerier_GetAllSeasons_Call struct {
+	*mock.Call
+}
+
+// GetAllSeasons is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *MockQuerier_Expecter) GetAllSeasons(ctx interface{}) *MockQuerier_GetAllSeasons_Call {
+	return &MockQuerier_GetAllSeasons_Call{Call: _e.mock.On("GetAllSeasons", ctx)}
+}
+
+func (_c *MockQuerier_GetAllSeasons_Call) Run(run func(ctx context.Context)) *MockQuerier_GetAllSeasons_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *MockQuerier_GetAllSeasons_Call) Return(_a0 []dal.Season, _a1 error) *MockQuerier_GetAllSeasons_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockQuerier_GetAllSeasons_Call) RunAndReturn(run func(context.Context) ([]dal.Season, error)) *MockQuerier_GetAllSeasons_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetDriver provides a mock function with given fields: ctx, id
 func (_m *MockQuerier) GetDriver(ctx context.Context, id int32) (dal.Driver, error) {
 	ret := _m.Called(ctx, id)
