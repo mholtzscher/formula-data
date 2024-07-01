@@ -5,6 +5,12 @@ import "buf/validate/validate.proto";
 
 option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
 
+message Season {
+  int32 season_id = 1;
+  int32 year = 2;
+  string series = 3;
+}
+
 message CreateSeasonRequest {
   int32 year = 1 [(buf.validate.field).int32 = {
     gt: 1900,
@@ -17,6 +23,15 @@ message CreateSeasonResponse {
   int32 season_id = 1;
 }
 
+message GetSeasonRequest {
+  int32 season_id = 1 [(buf.validate.field).required = true];
+}
+
+message GetSeasonResponse {
+  Season season = 1;
+}
+
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
+  rpc GetSeason(GetSeasonRequest) returns (GetSeasonResponse) {}
 }
