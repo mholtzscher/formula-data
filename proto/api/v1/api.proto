@@ -23,15 +23,15 @@ message CreateSeasonResponse {
   int32 season_id = 1;
 }
 
-message GetSeasonRequest {
+message GetSeasonByIdRequest {
   int32 season_id = 1 [(buf.validate.field).required = true];
 }
 
-message GetSeasonResponse {
+message GetSeasonByIdResponse {
   Season season = 1;
 }
 
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
-  rpc GetSeason(GetSeasonRequest) returns (GetSeasonResponse) {}
+  rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
 }

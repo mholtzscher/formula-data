@@ -30,13 +30,13 @@ func (q *Queries) CreateSeason(ctx context.Context, arg CreateSeasonParams) (int
 	return id, err
 }
 
-const getSeason = `-- name: GetSeason :one
+const getSeasonById = `-- name: GetSeasonById :one
 SELECT id, season_year, series FROM season
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetSeason(ctx context.Context, id int32) (Season, error) {
-	row := q.db.QueryRow(ctx, getSeason, id)
+func (q *Queries) GetSeasonById(ctx context.Context, id int32) (Season, error) {
+	row := q.db.QueryRow(ctx, getSeasonById, id)
 	var i Season
 	err := row.Scan(&i.ID, &i.SeasonYear, &i.Series)
 	return i, err

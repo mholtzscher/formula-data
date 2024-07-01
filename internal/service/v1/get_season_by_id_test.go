@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetSeason(t *testing.T) {
+func TestGetSeasonById(t *testing.T) {
 	mockDB := mocks.NewMockQuerier(t)
 	service := NewFormulaDataServer(mockDB)
 
@@ -22,13 +22,13 @@ func TestGetSeason(t *testing.T) {
 			SeasonYear: 2024,
 			Series:     "Formula Test",
 		}
-		mockDB.On("GetSeason", mock.Anything, int32(42)).Return(season, nil).Once()
-		request := &connect.Request[apiv1.GetSeasonRequest]{
-			Msg: &apiv1.GetSeasonRequest{
+		mockDB.On("GetSeasonById", mock.Anything, int32(42)).Return(season, nil).Once()
+		request := &connect.Request[apiv1.GetSeasonByIdRequest]{
+			Msg: &apiv1.GetSeasonByIdRequest{
 				SeasonId: 42,
 			},
 		}
-		result, err := service.GetSeason(context.Background(), request)
+		result, err := service.GetSeasonById(context.Background(), request)
 
 		mockDB.AssertExpectations(t)
 		assert.Nil(t, err)
@@ -36,13 +36,13 @@ func TestGetSeason(t *testing.T) {
 	})
 
 	t.Run("should return error when get season returns an error", func(t *testing.T) {
-		mockDB.On("GetSeason", mock.Anything, int32(42)).Return(dal.Season{}, assert.AnError).Once()
-		request := &connect.Request[apiv1.GetSeasonRequest]{
-			Msg: &apiv1.GetSeasonRequest{
+		mockDB.On("GetSeasonById", mock.Anything, int32(42)).Return(dal.Season{}, assert.AnError).Once()
+		request := &connect.Request[apiv1.GetSeasonByIdRequest]{
+			Msg: &apiv1.GetSeasonByIdRequest{
 				SeasonId: 42,
 			},
 		}
-		result, err := service.GetSeason(context.Background(), request)
+		result, err := service.GetSeasonById(context.Background(), request)
 
 		mockDB.AssertExpectations(t)
 		assert.NotNil(t, err)

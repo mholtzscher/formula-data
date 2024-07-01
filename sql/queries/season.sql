@@ -1,4 +1,4 @@
--- name: GetSeason :one
+-- name: GetSeasonById :one
 SELECT * FROM season
 WHERE id = $1 LIMIT 1;
 

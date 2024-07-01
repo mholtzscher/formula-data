@@ -250,12 +250,12 @@ func (_c *MockQuerier_GetResult_Call) RunAndReturn(run func(context.Context, int
 	return _c
 }
 
-// GetSeason provides a mock function with given fields: ctx, id
-func (_m *MockQuerier) GetSeason(ctx context.Context, id int32) (dal.Season, error) {
+// GetSeasonById provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) GetSeasonById(ctx context.Context, id int32) (dal.Season, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetSeason")
+		panic("no return value specified for GetSeasonById")
 	}
 
 	var r0 dal.Season
@@ -278,31 +278,31 @@ func (_m *MockQuerier) GetSeason(ctx context.Context, id int32) (dal.Season, err
 	return r0, r1
 }
 
-// MockQuerier_GetSeason_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSeason'
-type MockQuerier_GetSeason_Call struct {
+// MockQuerier_GetSeasonById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSeasonById'
+type MockQuerier_GetSeasonById_Call struct {
 	*mock.Call
 }
 
-// GetSeason is a helper method to define mock.On call
+// GetSeasonById is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int32
-func (_e *MockQuerier_Expecter) GetSeason(ctx interface{}, id interface{}) *MockQuerier_GetSeason_Call {
-	return &MockQuerier_GetSeason_Call{Call: _e.mock.On("GetSeason", ctx, id)}
+func (_e *MockQuerier_Expecter) GetSeasonById(ctx interface{}, id interface{}) *MockQuerier_GetSeasonById_Call {
+	return &MockQuerier_GetSeasonById_Call{Call: _e.mock.On("GetSeasonById", ctx, id)}
 }
 
-func (_c *MockQuerier_GetSeason_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetSeason_Call {
+func (_c *MockQuerier_GetSeasonById_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetSeasonById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int32))
 	})
 	return _c
 }
 
-func (_c *MockQuerier_GetSeason_Call) Return(_a0 dal.Season, _a1 error) *MockQuerier_GetSeason_Call {
+func (_c *MockQuerier_GetSeasonById_Call) Return(_a0 dal.Season, _a1 error) *MockQuerier_GetSeasonById_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuerier_GetSeason_Call) RunAndReturn(run func(context.Context, int32) (dal.Season, error)) *MockQuerier_GetSeason_Call {
+func (_c *MockQuerier_GetSeasonById_Call) RunAndReturn(run func(context.Context, int32) (dal.Season, error)) *MockQuerier_GetSeasonById_Call {
 	_c.Call.Return(run)
 	return _c
 }
