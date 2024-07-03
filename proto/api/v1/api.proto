@@ -2,6 +2,7 @@ syntax = "proto3";
 package api.v1;
 
 import "buf/validate/validate.proto";
+import "google/type/date.proto";
 
 option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
 
@@ -37,8 +38,20 @@ message GetAllSeasonsResponse {
   repeated Season seasons = 1;
 }
 
+message CreateDriverRequest {
+  string first_name = 1 [(buf.validate.field).required = true];
+  string last_name = 2 [(buf.validate.field).required = true];
+  string place_of_birth = 3 [(buf.validate.field).required = true];
+  google.type.Date date_of_birth = 4 [(buf.validate.field).required = true];
+}
+
+message CreateDriverResponse {
+  int32 driver_id = 1;
+}
+
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
   rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
   rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
+  rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
 }

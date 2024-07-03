@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CreateDriver(ctx context.Context, arg CreateDriverParams) (int32, error)
 	CreateSeason(ctx context.Context, arg CreateSeasonParams) (int32, error)
 	GetAllSeasons(ctx context.Context) ([]Season, error)
 	GetDriver(ctx context.Context, id int32) (Driver, error)
