@@ -17,7 +17,6 @@ import (
 	"github.com/mholtzscher/formula-data/internal/dal"
 	srvV1 "github.com/mholtzscher/formula-data/internal/service/v1"
 	"github.com/pressly/goose/v3"
-	"github.com/rs/zerolog/log"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -30,23 +29,30 @@ type IntegrationTestHelper struct {
 }
 
 func CreateIntegrationTestHelper(t *testing.T) *IntegrationTestHelper {
+	t.Helper()
 	ctx := context.Background()
 	container, connStr := createPostgresContainer(t, ctx)
 	t.Cleanup(func() {
-		container.Terminate(ctx)
+		err := container.Terminate(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
 	})
 
 	conn, err := pgx.Connect(ctx, connStr)
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not connect to database")
+		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		conn.Close(ctx)
+		err := conn.Close(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
 	})
 
 	validator, err := validate.NewInterceptor()
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not create validation interceptor")
+		t.Fatal(err)
 	}
 
 	queries := dal.New(conn)
@@ -71,20 +77,19 @@ func CreateIntegrationTestHelper(t *testing.T) *IntegrationTestHelper {
 	}
 }
 
-func runMigrations(db *sql.DB) {
+func runMigrations(t *testing.T, db *sql.DB) {
 	goose.SetBaseFS(formuladata.MigrationsFileSystem)
 
 	if err := goose.SetDialect("postgres"); err != nil {
-		log.Fatal().Err(err).Msg("failed to set goose dialect")
+		t.Fatal(err)
 	}
 
 	if err := goose.Up(db, "sql/migrations"); err != nil {
-		log.Fatal().Err(err).Msg("failed to run migrations on test container")
+		t.Fatal(err)
 	}
 }
 
 func createPostgresContainer(t *testing.T, ctx context.Context) (*postgres.PostgresContainer, string) {
-	t.Helper()
 	pgContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("postgres:16-alpine"),
 		postgres.WithDatabase("test-db"),
@@ -95,21 +100,21 @@ func createPostgresContainer(t *testing.T, ctx context.Context) (*postgres.Postg
 				WithOccurrence(2).WithStartupTimeout(5*time.Second)),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to start postgres test container")
+		t.Fatal(err)
 	}
 
 	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to get connection string from test container")
+		t.Fatal(err)
 	}
 
 	conn, err := sql.Open("pgx", connStr)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to open sql conn to test container")
+		t.Fatal(err)
 	}
 	defer conn.Close()
 
-	runMigrations(conn)
+	runMigrations(t, conn)
 
 	return pgContainer, connStr
 }
