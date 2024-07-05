@@ -3,10 +3,19 @@ package integration
 import (
 	"context"
 	"database/sql"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 	"time"
 
+	"connectrpc.com/connect"
+	"connectrpc.com/validate"
+	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	formuladata "github.com/mholtzscher/formula-data"
+	"github.com/mholtzscher/formula-data/gen/api/v1/apiv1connect"
+	"github.com/mholtzscher/formula-data/internal/dal"
+	srvV1 "github.com/mholtzscher/formula-data/internal/service/v1"
 	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/testcontainers/testcontainers-go"
@@ -14,12 +23,50 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-type PostgresContainer struct {
+type postgresContainer struct {
 	*postgres.PostgresContainer
 	ConnectionString string
 }
 
-func RunMigrations(db *sql.DB) {
+func CreateTestServerAndClient(t *testing.T) apiv1connect.FormulaDataServiceClient {
+	ctx := context.Background()
+	container := createPostgresContainer(t, ctx)
+	t.Cleanup(func() {
+		container.Terminate(ctx)
+	})
+
+	conn, err := pgx.Connect(ctx, container.ConnectionString)
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not connect to database")
+	}
+	t.Cleanup(func() {
+		conn.Close(ctx)
+	})
+
+	validator, err := validate.NewInterceptor()
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not create validation interceptor")
+	}
+
+	queries := dal.New(conn)
+	fdServer := srvV1.NewFormulaDataServer(queries)
+
+	mux := http.NewServeMux()
+	mux.Handle(
+		apiv1connect.NewFormulaDataServiceHandler(
+			fdServer,
+			connect.WithInterceptors(validator),
+		),
+	)
+	server := httptest.NewUnstartedServer(mux)
+	server.EnableHTTP2 = true
+	server.StartTLS()
+	t.Cleanup(server.Close)
+
+	return apiv1connect.NewFormulaDataServiceClient(server.Client(), server.URL)
+}
+
+func runMigrations(db *sql.DB) {
 	goose.SetBaseFS(formuladata.MigrationsFileSystem)
 
 	if err := goose.SetDialect("postgres"); err != nil {
@@ -31,7 +78,8 @@ func RunMigrations(db *sql.DB) {
 	}
 }
 
-func CreatePostgresContainer(ctx context.Context) *PostgresContainer {
+func createPostgresContainer(t *testing.T, ctx context.Context) *postgresContainer {
+	t.Helper()
 	pgContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("postgres:15.3-alpine"),
 		postgres.WithDatabase("test-db"),
@@ -56,9 +104,9 @@ func CreatePostgresContainer(ctx context.Context) *PostgresContainer {
 	}
 	defer conn.Close()
 
-	RunMigrations(conn)
+	runMigrations(conn)
 
-	return &PostgresContainer{
+	return &postgresContainer{
 		PostgresContainer: pgContainer,
 		ConnectionString:  connStr,
 	}

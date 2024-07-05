@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 	apiv1 "github.com/mholtzscher/formula-data/gen/api/v1"
 	"github.com/mholtzscher/formula-data/internal/dal"
+	"github.com/rs/zerolog/log"
 )
 
 func (s *FormulaDataServer) CreateSeason(
@@ -17,7 +18,8 @@ func (s *FormulaDataServer) CreateSeason(
 		Series:     request.Msg.Series,
 	})
 	if err != nil {
-		return nil, err
+		log.Error().Err(err).Msg("failed to insert to db")
+		return nil, mapPgErrorsToReturnCodes(err)
 	}
 	return &connect.Response[apiv1.CreateSeasonResponse]{
 		Msg: &apiv1.CreateSeasonResponse{
