@@ -110,6 +110,14 @@ func TestGetSeasonById(t *testing.T) {
 		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 	})
 
+	t.Run("season id should be greater than 0", func(t *testing.T) {
+		_, err := client.GetSeasonById(context.Background(), connect.NewRequest(&apiv1.GetSeasonByIdRequest{
+			SeasonId: -1,
+		}))
+		assert.NotNil(t, err)
+		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	})
+
 	t.Run("should return validation error when id is not in request", func(t *testing.T) {
 		_, err := client.GetSeasonById(context.Background(), connect.NewRequest(&apiv1.GetSeasonByIdRequest{}))
 		assert.NotNil(t, err)
