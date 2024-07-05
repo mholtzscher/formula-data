@@ -5,6 +5,7 @@ import (
 
 	"connectrpc.com/connect"
 	apiv1 "github.com/mholtzscher/formula-data/gen/api/v1"
+	"github.com/rs/zerolog/log"
 )
 
 func (s *FormulaDataServer) GetSeasonById(
@@ -13,7 +14,8 @@ func (s *FormulaDataServer) GetSeasonById(
 ) (*connect.Response[apiv1.GetSeasonByIdResponse], error) {
 	season, err := s.DB.GetSeasonById(ctx, request.Msg.SeasonId)
 	if err != nil {
-		return nil, err
+		log.Error().Err(err).Msg("failed to get season by id")
+		return nil, mapPgErrorsToReturnCodes(err)
 	}
 	return &connect.Response[apiv1.GetSeasonByIdResponse]{
 		Msg: &apiv1.GetSeasonByIdResponse{

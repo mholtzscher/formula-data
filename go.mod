@@ -6,6 +6,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.33.0-20240401165935-b983156c5e99.1
 	connectrpc.com/connect v1.16.2
 	connectrpc.com/validate v0.1.0
+	github.com/brianvoe/gofakeit/v7 v7.0.4
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/peterbourgon/ff/v3 v3.4.0
 	github.com/rs/zerolog v1.33.0
