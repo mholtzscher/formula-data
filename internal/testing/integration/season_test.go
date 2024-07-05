@@ -12,7 +12,8 @@ import (
 )
 
 func TestCreateSeason(t *testing.T) {
-	client := CreateTestServerAndClient(t)
+	helper := CreateIntegrationTestHelper(t)
+	client := helper.Client
 
 	t.Run("create season should return season id", func(t *testing.T) {
 		result, err := client.CreateSeason(context.Background(), connect.NewRequest(&apiv1.CreateSeasonRequest{
@@ -79,7 +80,8 @@ func TestCreateSeason(t *testing.T) {
 }
 
 func TestGetSeasonById(t *testing.T) {
-	client := CreateTestServerAndClient(t)
+	helper := CreateIntegrationTestHelper(t)
+	client := helper.Client
 
 	t.Run("should return season when querying by id", func(t *testing.T) {
 		year := int32(gofakeit.IntRange(1900, 2100))
@@ -116,7 +118,8 @@ func TestGetSeasonById(t *testing.T) {
 }
 
 func TestGetAllSeasons(t *testing.T) {
-	client := CreateTestServerAndClient(t)
+	helper := CreateIntegrationTestHelper(t)
+	client := helper.Client
 
 	t.Run("should return all seasons", func(t *testing.T) {
 		result, err := client.CreateSeason(context.Background(), connect.NewRequest(&apiv1.CreateSeasonRequest{

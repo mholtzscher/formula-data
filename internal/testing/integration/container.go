@@ -23,19 +23,20 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-type postgresContainer struct {
-	*postgres.PostgresContainer
+type IntegrationTestHelper struct {
+	Client           apiv1connect.FormulaDataServiceClient
+	Container        *postgres.PostgresContainer
 	ConnectionString string
 }
 
-func CreateTestServerAndClient(t *testing.T) apiv1connect.FormulaDataServiceClient {
+func CreateIntegrationTestHelper(t *testing.T) *IntegrationTestHelper {
 	ctx := context.Background()
-	container := createPostgresContainer(t, ctx)
+	container, connStr := createPostgresContainer(t, ctx)
 	t.Cleanup(func() {
 		container.Terminate(ctx)
 	})
 
-	conn, err := pgx.Connect(ctx, container.ConnectionString)
+	conn, err := pgx.Connect(ctx, connStr)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not connect to database")
 	}
@@ -63,7 +64,11 @@ func CreateTestServerAndClient(t *testing.T) apiv1connect.FormulaDataServiceClie
 	server.StartTLS()
 	t.Cleanup(server.Close)
 
-	return apiv1connect.NewFormulaDataServiceClient(server.Client(), server.URL)
+	return &IntegrationTestHelper{
+		Client:           apiv1connect.NewFormulaDataServiceClient(server.Client(), server.URL),
+		Container:        container,
+		ConnectionString: connStr,
+	}
 }
 
 func runMigrations(db *sql.DB) {
@@ -78,7 +83,7 @@ func runMigrations(db *sql.DB) {
 	}
 }
 
-func createPostgresContainer(t *testing.T, ctx context.Context) *postgresContainer {
+func createPostgresContainer(t *testing.T, ctx context.Context) (*postgres.PostgresContainer, string) {
 	t.Helper()
 	pgContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("postgres:15.3-alpine"),
@@ -106,8 +111,5 @@ func createPostgresContainer(t *testing.T, ctx context.Context) *postgresContain
 
 	runMigrations(conn)
 
-	return &postgresContainer{
-		PostgresContainer: pgContainer,
-		ConnectionString:  connStr,
-	}
+	return pgContainer, connStr
 }
