@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFormulaDataServer_Season(t *testing.T) {
+func TestCreateSeason(t *testing.T) {
 	client := CreateTestServerAndClient(t)
 
 	t.Run("create season should return season id", func(t *testing.T) {
@@ -76,6 +76,10 @@ func TestFormulaDataServer_Season(t *testing.T) {
 		assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
 		assert.Nil(t, result)
 	})
+}
+
+func TestGetSeasonById(t *testing.T) {
+	client := CreateTestServerAndClient(t)
 
 	t.Run("should return season when querying by id", func(t *testing.T) {
 		year := int32(gofakeit.IntRange(1900, 2100))
@@ -102,5 +106,35 @@ func TestFormulaDataServer_Season(t *testing.T) {
 		}))
 		assert.NotNil(t, err)
 		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	})
+
+	t.Run("should return validation error when id is not in request", func(t *testing.T) {
+		_, err := client.GetSeasonById(context.Background(), connect.NewRequest(&apiv1.GetSeasonByIdRequest{}))
+		assert.NotNil(t, err)
+		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	})
+}
+
+func TestGetAllSeasons(t *testing.T) {
+	client := CreateTestServerAndClient(t)
+
+	t.Run("should return all seasons", func(t *testing.T) {
+		result, err := client.CreateSeason(context.Background(), connect.NewRequest(&apiv1.CreateSeasonRequest{
+			Year:   int32(gofakeit.IntRange(1900, 2100)),
+			Series: gofakeit.Sentence(3),
+		}))
+		assert.Nil(t, err)
+		assert.NotNil(t, result.Msg.SeasonId)
+
+		result, err = client.CreateSeason(context.Background(), connect.NewRequest(&apiv1.CreateSeasonRequest{
+			Year:   int32(gofakeit.IntRange(1900, 2100)),
+			Series: gofakeit.Sentence(3),
+		}))
+		assert.Nil(t, err)
+		assert.NotNil(t, result.Msg.SeasonId)
+
+		actual, err := client.GetAllSeasons(context.Background(), connect.NewRequest(&apiv1.GetAllSeasonsRequest{}))
+		assert.Nil(t, err)
+		assert.Len(t, actual.Msg.Seasons, 2)
 	})
 }
