@@ -28,7 +28,7 @@ func (s *FormulaDataServer) CreateDriver(
 		DateOfBirth:  dob,
 	})
 	if err != nil {
-		return nil, err
+		return nil, mapPgErrorsToReturnCodes(err)
 	}
 
 	return &connect.Response[apiv1.CreateDriverResponse]{

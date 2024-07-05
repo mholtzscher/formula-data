@@ -137,4 +137,27 @@ func TestCreateDriver(t *testing.T) {
 		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 		assert.Nil(t, result)
 	})
+
+	t.Run("should not allow duplicate driver", func(t *testing.T) {
+		d := gofakeit.Date()
+		request := connect.NewRequest(&apiv1.CreateDriverRequest{
+			FirstName:    gofakeit.FirstName(),
+			LastName:     gofakeit.LastName(),
+			PlaceOfBirth: gofakeit.City(),
+			DateOfBirth: &date.Date{
+				Year:  int32(d.Year()),
+				Month: int32(d.Month()),
+				Day:   int32(d.Day()),
+			},
+		})
+
+		result, err := client.CreateDriver(context.Background(), request)
+		assert.Nil(t, err)
+		assert.NotNil(t, result.Msg.DriverId)
+
+		result, err = client.CreateDriver(context.Background(), request)
+		assert.NotNil(t, err)
+		assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+		assert.Nil(t, result)
+	})
 }
