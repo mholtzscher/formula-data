@@ -86,7 +86,7 @@ func runMigrations(db *sql.DB) {
 func createPostgresContainer(t *testing.T, ctx context.Context) (*postgres.PostgresContainer, string) {
 	t.Helper()
 	pgContainer, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:15.3-alpine"),
+		testcontainers.WithImage("postgres:16-alpine"),
 		postgres.WithDatabase("test-db"),
 		postgres.WithUsername("postgres"),
 		postgres.WithPassword("postgres"),
