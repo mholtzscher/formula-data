@@ -39,6 +39,22 @@ message GetAllSeasonsResponse {
 }
 
 message CreateDriverRequest {
+  option (buf.validate.message).cel = {
+    id: "create_driver_dob_year",
+    message: "the date of birth must have year",
+    expression: "has(this.date_of_birth.year)"
+  };
+  option (buf.validate.message).cel = {
+    id: "create_driver_dob_month",
+    message: "the date of birth must have month",
+    expression: "has(this.date_of_birth.month)"
+  };
+  option (buf.validate.message).cel = {
+    id: "create_driver_dob_day",
+    message: "the date of birth must have day",
+    expression: "has(this.date_of_birth.day)"
+  };
+
   string first_name = 1 [(buf.validate.field).required = true];
   string last_name = 2 [(buf.validate.field).required = true];
   string place_of_birth = 3 [(buf.validate.field).required = true];
