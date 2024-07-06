@@ -12,6 +12,14 @@ message Season {
   string series = 3;
 }
 
+message Driver {
+  int32 driver_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string place_of_birth = 4;
+  google.type.Date date_of_birth = 5;
+}
+
 message CreateSeasonRequest {
   int32 year = 1 [(buf.validate.field).int32 = {
     gt: 1900,
@@ -65,9 +73,18 @@ message CreateDriverResponse {
   int32 driver_id = 1;
 }
 
+message GetDriverByIdRequest {
+  int32 driver_id = 1 [(buf.validate.field).int32 = {gt: 0}];
+}
+
+message GetDriverByIdResponse {
+  Driver driver = 1;
+}
+
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
   rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
   rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
   rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
+  rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {}
 }

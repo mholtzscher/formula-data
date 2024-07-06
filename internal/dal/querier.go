@@ -12,7 +12,7 @@ type Querier interface {
 	CreateDriver(ctx context.Context, arg CreateDriverParams) (int32, error)
 	CreateSeason(ctx context.Context, arg CreateSeasonParams) (int32, error)
 	GetAllSeasons(ctx context.Context) ([]Season, error)
-	GetDriver(ctx context.Context, id int32) (Driver, error)
+	GetDriverById(ctx context.Context, id int32) (Driver, error)
 	GetRace(ctx context.Context, id int32) (Race, error)
 	GetResult(ctx context.Context, id int32) (Result, error)
 	GetSeasonById(ctx context.Context, id int32) (Season, error)

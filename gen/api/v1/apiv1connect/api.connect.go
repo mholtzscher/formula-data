@@ -45,6 +45,9 @@ const (
 	// FormulaDataServiceCreateDriverProcedure is the fully-qualified name of the FormulaDataService's
 	// CreateDriver RPC.
 	FormulaDataServiceCreateDriverProcedure = "/api.v1.FormulaDataService/CreateDriver"
+	// FormulaDataServiceGetDriverByIdProcedure is the fully-qualified name of the FormulaDataService's
+	// GetDriverById RPC.
+	FormulaDataServiceGetDriverByIdProcedure = "/api.v1.FormulaDataService/GetDriverById"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -54,6 +57,7 @@ var (
 	formulaDataServiceGetSeasonByIdMethodDescriptor = formulaDataServiceServiceDescriptor.Methods().ByName("GetSeasonById")
 	formulaDataServiceGetAllSeasonsMethodDescriptor = formulaDataServiceServiceDescriptor.Methods().ByName("GetAllSeasons")
 	formulaDataServiceCreateDriverMethodDescriptor  = formulaDataServiceServiceDescriptor.Methods().ByName("CreateDriver")
+	formulaDataServiceGetDriverByIdMethodDescriptor = formulaDataServiceServiceDescriptor.Methods().ByName("GetDriverById")
 )
 
 // FormulaDataServiceClient is a client for the api.v1.FormulaDataService service.
@@ -62,6 +66,7 @@ type FormulaDataServiceClient interface {
 	GetSeasonById(context.Context, *connect.Request[v1.GetSeasonByIdRequest]) (*connect.Response[v1.GetSeasonByIdResponse], error)
 	GetAllSeasons(context.Context, *connect.Request[v1.GetAllSeasonsRequest]) (*connect.Response[v1.GetAllSeasonsResponse], error)
 	CreateDriver(context.Context, *connect.Request[v1.CreateDriverRequest]) (*connect.Response[v1.CreateDriverResponse], error)
+	GetDriverById(context.Context, *connect.Request[v1.GetDriverByIdRequest]) (*connect.Response[v1.GetDriverByIdResponse], error)
 }
 
 // NewFormulaDataServiceClient constructs a client for the api.v1.FormulaDataService service. By
@@ -98,6 +103,12 @@ func NewFormulaDataServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(formulaDataServiceCreateDriverMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getDriverById: connect.NewClient[v1.GetDriverByIdRequest, v1.GetDriverByIdResponse](
+			httpClient,
+			baseURL+FormulaDataServiceGetDriverByIdProcedure,
+			connect.WithSchema(formulaDataServiceGetDriverByIdMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -107,6 +118,7 @@ type formulaDataServiceClient struct {
 	getSeasonById *connect.Client[v1.GetSeasonByIdRequest, v1.GetSeasonByIdResponse]
 	getAllSeasons *connect.Client[v1.GetAllSeasonsRequest, v1.GetAllSeasonsResponse]
 	createDriver  *connect.Client[v1.CreateDriverRequest, v1.CreateDriverResponse]
+	getDriverById *connect.Client[v1.GetDriverByIdRequest, v1.GetDriverByIdResponse]
 }
 
 // CreateSeason calls api.v1.FormulaDataService.CreateSeason.
@@ -129,12 +141,18 @@ func (c *formulaDataServiceClient) CreateDriver(ctx context.Context, req *connec
 	return c.createDriver.CallUnary(ctx, req)
 }
 
+// GetDriverById calls api.v1.FormulaDataService.GetDriverById.
+func (c *formulaDataServiceClient) GetDriverById(ctx context.Context, req *connect.Request[v1.GetDriverByIdRequest]) (*connect.Response[v1.GetDriverByIdResponse], error) {
+	return c.getDriverById.CallUnary(ctx, req)
+}
+
 // FormulaDataServiceHandler is an implementation of the api.v1.FormulaDataService service.
 type FormulaDataServiceHandler interface {
 	CreateSeason(context.Context, *connect.Request[v1.CreateSeasonRequest]) (*connect.Response[v1.CreateSeasonResponse], error)
 	GetSeasonById(context.Context, *connect.Request[v1.GetSeasonByIdRequest]) (*connect.Response[v1.GetSeasonByIdResponse], error)
 	GetAllSeasons(context.Context, *connect.Request[v1.GetAllSeasonsRequest]) (*connect.Response[v1.GetAllSeasonsResponse], error)
 	CreateDriver(context.Context, *connect.Request[v1.CreateDriverRequest]) (*connect.Response[v1.CreateDriverResponse], error)
+	GetDriverById(context.Context, *connect.Request[v1.GetDriverByIdRequest]) (*connect.Response[v1.GetDriverByIdResponse], error)
 }
 
 // NewFormulaDataServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -167,6 +185,12 @@ func NewFormulaDataServiceHandler(svc FormulaDataServiceHandler, opts ...connect
 		connect.WithSchema(formulaDataServiceCreateDriverMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	formulaDataServiceGetDriverByIdHandler := connect.NewUnaryHandler(
+		FormulaDataServiceGetDriverByIdProcedure,
+		svc.GetDriverById,
+		connect.WithSchema(formulaDataServiceGetDriverByIdMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/api.v1.FormulaDataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case FormulaDataServiceCreateSeasonProcedure:
@@ -177,6 +201,8 @@ func NewFormulaDataServiceHandler(svc FormulaDataServiceHandler, opts ...connect
 			formulaDataServiceGetAllSeasonsHandler.ServeHTTP(w, r)
 		case FormulaDataServiceCreateDriverProcedure:
 			formulaDataServiceCreateDriverHandler.ServeHTTP(w, r)
+		case FormulaDataServiceGetDriverByIdProcedure:
+			formulaDataServiceGetDriverByIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -200,4 +226,8 @@ func (UnimplementedFormulaDataServiceHandler) GetAllSeasons(context.Context, *co
 
 func (UnimplementedFormulaDataServiceHandler) CreateDriver(context.Context, *connect.Request[v1.CreateDriverRequest]) (*connect.Response[v1.CreateDriverResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.FormulaDataService.CreateDriver is not implemented"))
+}
+
+func (UnimplementedFormulaDataServiceHandler) GetDriverById(context.Context, *connect.Request[v1.GetDriverByIdRequest]) (*connect.Response[v1.GetDriverByIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.FormulaDataService.GetDriverById is not implemented"))
 }

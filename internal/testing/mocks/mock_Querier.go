@@ -194,12 +194,12 @@ func (_c *MockQuerier_GetAllSeasons_Call) RunAndReturn(run func(context.Context)
 	return _c
 }
 
-// GetDriver provides a mock function with given fields: ctx, id
-func (_m *MockQuerier) GetDriver(ctx context.Context, id int32) (dal.Driver, error) {
+// GetDriverById provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) GetDriverById(ctx context.Context, id int32) (dal.Driver, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetDriver")
+		panic("no return value specified for GetDriverById")
 	}
 
 	var r0 dal.Driver
@@ -222,31 +222,31 @@ func (_m *MockQuerier) GetDriver(ctx context.Context, id int32) (dal.Driver, err
 	return r0, r1
 }
 
-// MockQuerier_GetDriver_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDriver'
-type MockQuerier_GetDriver_Call struct {
+// MockQuerier_GetDriverById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDriverById'
+type MockQuerier_GetDriverById_Call struct {
 	*mock.Call
 }
 
-// GetDriver is a helper method to define mock.On call
+// GetDriverById is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int32
-func (_e *MockQuerier_Expecter) GetDriver(ctx interface{}, id interface{}) *MockQuerier_GetDriver_Call {
-	return &MockQuerier_GetDriver_Call{Call: _e.mock.On("GetDriver", ctx, id)}
+func (_e *MockQuerier_Expecter) GetDriverById(ctx interface{}, id interface{}) *MockQuerier_GetDriverById_Call {
+	return &MockQuerier_GetDriverById_Call{Call: _e.mock.On("GetDriverById", ctx, id)}
 }
 
-func (_c *MockQuerier_GetDriver_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetDriver_Call {
+func (_c *MockQuerier_GetDriverById_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetDriverById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int32))
 	})
 	return _c
 }
 
-func (_c *MockQuerier_GetDriver_Call) Return(_a0 dal.Driver, _a1 error) *MockQuerier_GetDriver_Call {
+func (_c *MockQuerier_GetDriverById_Call) Return(_a0 dal.Driver, _a1 error) *MockQuerier_GetDriverById_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuerier_GetDriver_Call) RunAndReturn(run func(context.Context, int32) (dal.Driver, error)) *MockQuerier_GetDriver_Call {
+func (_c *MockQuerier_GetDriverById_Call) RunAndReturn(run func(context.Context, int32) (dal.Driver, error)) *MockQuerier_GetDriverById_Call {
 	_c.Call.Return(run)
 	return _c
 }

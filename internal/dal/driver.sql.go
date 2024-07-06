@@ -39,13 +39,13 @@ func (q *Queries) CreateDriver(ctx context.Context, arg CreateDriverParams) (int
 	return id, err
 }
 
-const getDriver = `-- name: GetDriver :one
+const getDriverById = `-- name: GetDriverById :one
 SELECT id, first_name, last_name, place_of_birth, date_of_birth FROM driver
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetDriver(ctx context.Context, id int32) (Driver, error) {
-	row := q.db.QueryRow(ctx, getDriver, id)
+func (q *Queries) GetDriverById(ctx context.Context, id int32) (Driver, error) {
+	row := q.db.QueryRow(ctx, getDriverById, id)
 	var i Driver
 	err := row.Scan(
 		&i.ID,
