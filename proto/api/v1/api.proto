@@ -1,23 +1,18 @@
 syntax = "proto3";
 package api.v1;
 
+import "api/v1/models.proto";
 import "buf/validate/validate.proto";
 import "google/type/date.proto";
 
 option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
 
-message Season {
-  int32 season_id = 1;
-  int32 year = 2;
-  string series = 3;
-}
-
-message Driver {
-  int32 driver_id = 1;
-  string first_name = 2;
-  string last_name = 3;
-  string place_of_birth = 4;
-  google.type.Date date_of_birth = 5;
+service FormulaDataService {
+  rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
+  rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
+  rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
+  rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
+  rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {}
 }
 
 message CreateSeasonRequest {
@@ -79,12 +74,4 @@ message GetDriverByIdRequest {
 
 message GetDriverByIdResponse {
   Driver driver = 1;
-}
-
-service FormulaDataService {
-  rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
-  rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
-  rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
-  rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
-  rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {}
 }
