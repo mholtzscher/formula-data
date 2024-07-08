@@ -136,6 +136,63 @@ func (_c *MockQuerier_CreateSeason_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
+// CreateTeam provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) CreateTeam(ctx context.Context, arg dal.CreateTeamParams) (int32, error) {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateTeam")
+	}
+
+	var r0 int32
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, dal.CreateTeamParams) (int32, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, dal.CreateTeamParams) int32); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(int32)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, dal.CreateTeamParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockQuerier_CreateTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateTeam'
+type MockQuerier_CreateTeam_Call struct {
+	*mock.Call
+}
+
+// CreateTeam is a helper method to define mock.On call
+//   - ctx context.Context
+//   - arg dal.CreateTeamParams
+func (_e *MockQuerier_Expecter) CreateTeam(ctx interface{}, arg interface{}) *MockQuerier_CreateTeam_Call {
+	return &MockQuerier_CreateTeam_Call{Call: _e.mock.On("CreateTeam", ctx, arg)}
+}
+
+func (_c *MockQuerier_CreateTeam_Call) Run(run func(ctx context.Context, arg dal.CreateTeamParams)) *MockQuerier_CreateTeam_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(dal.CreateTeamParams))
+	})
+	return _c
+}
+
+func (_c *MockQuerier_CreateTeam_Call) Return(_a0 int32, _a1 error) *MockQuerier_CreateTeam_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockQuerier_CreateTeam_Call) RunAndReturn(run func(context.Context, dal.CreateTeamParams) (int32, error)) *MockQuerier_CreateTeam_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetAllSeasons provides a mock function with given fields: ctx
 func (_m *MockQuerier) GetAllSeasons(ctx context.Context) ([]dal.Season, error) {
 	ret := _m.Called(ctx)
@@ -422,12 +479,12 @@ func (_c *MockQuerier_GetSeasonById_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
-// GetTeam provides a mock function with given fields: ctx, id
-func (_m *MockQuerier) GetTeam(ctx context.Context, id int32) (dal.Team, error) {
+// GetTeamById provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) GetTeamById(ctx context.Context, id int32) (dal.Team, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetTeam")
+		panic("no return value specified for GetTeamById")
 	}
 
 	var r0 dal.Team
@@ -450,89 +507,31 @@ func (_m *MockQuerier) GetTeam(ctx context.Context, id int32) (dal.Team, error) 
 	return r0, r1
 }
 
-// MockQuerier_GetTeam_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTeam'
-type MockQuerier_GetTeam_Call struct {
+// MockQuerier_GetTeamById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTeamById'
+type MockQuerier_GetTeamById_Call struct {
 	*mock.Call
 }
 
-// GetTeam is a helper method to define mock.On call
+// GetTeamById is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int32
-func (_e *MockQuerier_Expecter) GetTeam(ctx interface{}, id interface{}) *MockQuerier_GetTeam_Call {
-	return &MockQuerier_GetTeam_Call{Call: _e.mock.On("GetTeam", ctx, id)}
+func (_e *MockQuerier_Expecter) GetTeamById(ctx interface{}, id interface{}) *MockQuerier_GetTeamById_Call {
+	return &MockQuerier_GetTeamById_Call{Call: _e.mock.On("GetTeamById", ctx, id)}
 }
 
-func (_c *MockQuerier_GetTeam_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetTeam_Call {
+func (_c *MockQuerier_GetTeamById_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetTeamById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int32))
 	})
 	return _c
 }
 
-func (_c *MockQuerier_GetTeam_Call) Return(_a0 dal.Team, _a1 error) *MockQuerier_GetTeam_Call {
+func (_c *MockQuerier_GetTeamById_Call) Return(_a0 dal.Team, _a1 error) *MockQuerier_GetTeamById_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuerier_GetTeam_Call) RunAndReturn(run func(context.Context, int32) (dal.Team, error)) *MockQuerier_GetTeam_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ListTeams provides a mock function with given fields: ctx
-func (_m *MockQuerier) ListTeams(ctx context.Context) ([]dal.Team, error) {
-	ret := _m.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListTeams")
-	}
-
-	var r0 []dal.Team
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) ([]dal.Team, error)); ok {
-		return rf(ctx)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context) []dal.Team); ok {
-		r0 = rf(ctx)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]dal.Team)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockQuerier_ListTeams_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListTeams'
-type MockQuerier_ListTeams_Call struct {
-	*mock.Call
-}
-
-// ListTeams is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *MockQuerier_Expecter) ListTeams(ctx interface{}) *MockQuerier_ListTeams_Call {
-	return &MockQuerier_ListTeams_Call{Call: _e.mock.On("ListTeams", ctx)}
-}
-
-func (_c *MockQuerier_ListTeams_Call) Run(run func(ctx context.Context)) *MockQuerier_ListTeams_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
-	})
-	return _c
-}
-
-func (_c *MockQuerier_ListTeams_Call) Return(_a0 []dal.Team, _a1 error) *MockQuerier_ListTeams_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockQuerier_ListTeams_Call) RunAndReturn(run func(context.Context) ([]dal.Team, error)) *MockQuerier_ListTeams_Call {
+func (_c *MockQuerier_GetTeamById_Call) RunAndReturn(run func(context.Context, int32) (dal.Team, error)) *MockQuerier_GetTeamById_Call {
 	_c.Call.Return(run)
 	return _c
 }

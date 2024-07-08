@@ -13,6 +13,7 @@ service FormulaDataService {
   rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
   rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
   rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {}
+  rpc CreateTeam(CreateTeamRequest) returns (CreateTeamResponse) {}
 }
 
 message CreateSeasonRequest {
@@ -74,4 +75,13 @@ message GetDriverByIdRequest {
 
 message GetDriverByIdResponse {
   Driver driver = 1;
+}
+
+message CreateTeamRequest {
+  string name = 1 [(buf.validate.field).required = true];
+  string base = 2 [(buf.validate.field).required = true];
+}
+
+message CreateTeamResponse {
+  int32 team_id = 1;
 }

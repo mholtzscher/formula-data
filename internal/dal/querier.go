@@ -11,13 +11,13 @@ import (
 type Querier interface {
 	CreateDriver(ctx context.Context, arg CreateDriverParams) (int32, error)
 	CreateSeason(ctx context.Context, arg CreateSeasonParams) (int32, error)
+	CreateTeam(ctx context.Context, arg CreateTeamParams) (int32, error)
 	GetAllSeasons(ctx context.Context) ([]Season, error)
 	GetDriverById(ctx context.Context, id int32) (Driver, error)
 	GetRace(ctx context.Context, id int32) (Race, error)
 	GetResult(ctx context.Context, id int32) (Result, error)
 	GetSeasonById(ctx context.Context, id int32) (Season, error)
-	GetTeam(ctx context.Context, id int32) (Team, error)
-	ListTeams(ctx context.Context) ([]Team, error)
+	GetTeamById(ctx context.Context, id int32) (Team, error)
 }
 
 var _ Querier = (*Queries)(nil)

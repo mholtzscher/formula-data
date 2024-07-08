@@ -9,38 +9,35 @@ import (
 	"context"
 )
 
-const getTeam = `-- name: GetTeam :one
-SELECT id, team_name, base FROM team
+const createTeam = `-- name: CreateTeam :one
+INSERT INTO team 
+(name, base)
+VALUES (
+$1, $2
+)
+RETURNING id
+`
+
+type CreateTeamParams struct {
+	Name string
+	Base string
+}
+
+func (q *Queries) CreateTeam(ctx context.Context, arg CreateTeamParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createTeam, arg.Name, arg.Base)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getTeamById = `-- name: GetTeamById :one
+SELECT id, name, base FROM team
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetTeam(ctx context.Context, id int32) (Team, error) {
-	row := q.db.QueryRow(ctx, getTeam, id)
+func (q *Queries) GetTeamById(ctx context.Context, id int32) (Team, error) {
+	row := q.db.QueryRow(ctx, getTeamById, id)
 	var i Team
-	err := row.Scan(&i.ID, &i.TeamName, &i.Base)
+	err := row.Scan(&i.ID, &i.Name, &i.Base)
 	return i, err
-}
-
-const listTeams = `-- name: ListTeams :many
-SELECT id, team_name, base FROM team ORDER BY id
-`
-
-func (q *Queries) ListTeams(ctx context.Context) ([]Team, error) {
-	rows, err := q.db.Query(ctx, listTeams)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Team
-	for rows.Next() {
-		var i Team
-		if err := rows.Scan(&i.ID, &i.TeamName, &i.Base); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }

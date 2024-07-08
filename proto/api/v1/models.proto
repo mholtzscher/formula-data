@@ -18,3 +18,9 @@ message Driver {
   string place_of_birth = 4;
   google.type.Date date_of_birth = 5;
 }
+
+message Team {
+  int32 team_id = 1;
+  string name = 2;
+  string base = 3;
+}
