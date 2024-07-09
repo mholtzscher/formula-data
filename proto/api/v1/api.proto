@@ -21,9 +21,21 @@ service FormulaDataService {
   rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {
     option (google.api.http) = {get: "/v1/seasons"};
   }
-  rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
-  rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {}
-  rpc CreateTeam(CreateTeamRequest) returns (CreateTeamResponse) {}
+  rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {
+    option (google.api.http) = {
+      post: "/v1/drivers",
+      body: "*"
+    };
+  }
+  rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {
+    option (google.api.http) = {get: "/v1/drivers/{driver_id}"};
+  }
+  rpc CreateTeam(CreateTeamRequest) returns (CreateTeamResponse) {
+    option (google.api.http) = {
+      post: "/v1/teams",
+      body: "*"
+    };
+  }
 }
 
 message CreateSeasonRequest {
