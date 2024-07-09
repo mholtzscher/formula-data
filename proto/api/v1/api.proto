@@ -3,14 +3,24 @@ package api.v1;
 
 import "api/v1/models.proto";
 import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
 import "google/type/date.proto";
 
 option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
 
 service FormulaDataService {
-  rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {}
-  rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {}
-  rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {}
+  rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {
+    option (google.api.http) = {
+      post: "/v1/seasons",
+      body: "*"
+    };
+  }
+  rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {
+    option (google.api.http) = {get: "/v1/seasons/{season_id}"};
+  }
+  rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {
+    option (google.api.http) = {get: "/v1/seasons"};
+  }
   rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {}
   rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {}
   rpc CreateTeam(CreateTeamRequest) returns (CreateTeamResponse) {}

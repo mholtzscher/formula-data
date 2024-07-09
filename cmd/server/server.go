@@ -14,6 +14,7 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"
+	"connectrpc.com/vanguard"
 	"github.com/jackc/pgx/v5"
 	"github.com/mholtzscher/formula-data/gen/api/v1/apiv1connect"
 	"github.com/mholtzscher/formula-data/internal/dal"
@@ -65,18 +66,21 @@ func main() {
 		log.Fatal().Err(err).Msg("could not create validation interceptor")
 	}
 
-	log.Info().Msg("starting server")
-	mux := http.NewServeMux()
-	mux.Handle(apiv1connect.NewFormulaDataServiceHandler(
+	service := vanguard.NewService(apiv1connect.NewFormulaDataServiceHandler(
 		fdServer,
 		connect.WithInterceptors(validator),
 	),
 	)
 
+	handler, err := vanguard.NewTranscoder([]*vanguard.Service{service})
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not create transcoder")
+	}
+
 	srv := &http.Server{
 		Addr: *listenAddr,
 		Handler: h2c.NewHandler(
-			mux,
+			handler,
 			&http2.Server{},
 		),
 		ReadHeaderTimeout: time.Second,
@@ -84,9 +88,11 @@ func main() {
 		WriteTimeout:      5 * time.Minute,
 		MaxHeaderBytes:    8 * 1024, // 8KiB
 	}
+
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 	go func() {
+		log.Info().Msg("starting server")
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal().Msgf("HTTP listen and serve: %v", err)
 		}
