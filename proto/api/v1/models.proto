@@ -24,3 +24,11 @@ message Team {
   string name = 2;
   string base = 3;
 }
+
+message Race {
+  int32 race_id = 1;
+  int32 season_id = 2;
+  string name = 3;
+  string location = 4;
+  google.type.Date date = 5;
+}

@@ -19,9 +19,9 @@ type Driver struct {
 type Race struct {
 	ID       int32
 	SeasonID int32
-	RaceName string
+	Name     string
 	Location string
-	RaceDate pgtype.Date
+	Date     pgtype.Date
 }
 
 type Result struct {

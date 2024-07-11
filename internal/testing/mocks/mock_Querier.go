@@ -79,6 +79,63 @@ func (_c *MockQuerier_CreateDriver_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
+// CreateRace provides a mock function with given fields: ctx, arg
+func (_m *MockQuerier) CreateRace(ctx context.Context, arg dal.CreateRaceParams) (int32, error) {
+	ret := _m.Called(ctx, arg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateRace")
+	}
+
+	var r0 int32
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, dal.CreateRaceParams) (int32, error)); ok {
+		return rf(ctx, arg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, dal.CreateRaceParams) int32); ok {
+		r0 = rf(ctx, arg)
+	} else {
+		r0 = ret.Get(0).(int32)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, dal.CreateRaceParams) error); ok {
+		r1 = rf(ctx, arg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockQuerier_CreateRace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateRace'
+type MockQuerier_CreateRace_Call struct {
+	*mock.Call
+}
+
+// CreateRace is a helper method to define mock.On call
+//   - ctx context.Context
+//   - arg dal.CreateRaceParams
+func (_e *MockQuerier_Expecter) CreateRace(ctx interface{}, arg interface{}) *MockQuerier_CreateRace_Call {
+	return &MockQuerier_CreateRace_Call{Call: _e.mock.On("CreateRace", ctx, arg)}
+}
+
+func (_c *MockQuerier_CreateRace_Call) Run(run func(ctx context.Context, arg dal.CreateRaceParams)) *MockQuerier_CreateRace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(dal.CreateRaceParams))
+	})
+	return _c
+}
+
+func (_c *MockQuerier_CreateRace_Call) Return(_a0 int32, _a1 error) *MockQuerier_CreateRace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockQuerier_CreateRace_Call) RunAndReturn(run func(context.Context, dal.CreateRaceParams) (int32, error)) *MockQuerier_CreateRace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateSeason provides a mock function with given fields: ctx, arg
 func (_m *MockQuerier) CreateSeason(ctx context.Context, arg dal.CreateSeasonParams) (int32, error) {
 	ret := _m.Called(ctx, arg)
@@ -308,12 +365,12 @@ func (_c *MockQuerier_GetDriverById_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
-// GetRace provides a mock function with given fields: ctx, id
-func (_m *MockQuerier) GetRace(ctx context.Context, id int32) (dal.Race, error) {
+// GetRaceById provides a mock function with given fields: ctx, id
+func (_m *MockQuerier) GetRaceById(ctx context.Context, id int32) (dal.Race, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetRace")
+		panic("no return value specified for GetRaceById")
 	}
 
 	var r0 dal.Race
@@ -336,31 +393,31 @@ func (_m *MockQuerier) GetRace(ctx context.Context, id int32) (dal.Race, error) 
 	return r0, r1
 }
 
-// MockQuerier_GetRace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetRace'
-type MockQuerier_GetRace_Call struct {
+// MockQuerier_GetRaceById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetRaceById'
+type MockQuerier_GetRaceById_Call struct {
 	*mock.Call
 }
 
-// GetRace is a helper method to define mock.On call
+// GetRaceById is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int32
-func (_e *MockQuerier_Expecter) GetRace(ctx interface{}, id interface{}) *MockQuerier_GetRace_Call {
-	return &MockQuerier_GetRace_Call{Call: _e.mock.On("GetRace", ctx, id)}
+func (_e *MockQuerier_Expecter) GetRaceById(ctx interface{}, id interface{}) *MockQuerier_GetRaceById_Call {
+	return &MockQuerier_GetRaceById_Call{Call: _e.mock.On("GetRaceById", ctx, id)}
 }
 
-func (_c *MockQuerier_GetRace_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetRace_Call {
+func (_c *MockQuerier_GetRaceById_Call) Run(run func(ctx context.Context, id int32)) *MockQuerier_GetRaceById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int32))
 	})
 	return _c
 }
 
-func (_c *MockQuerier_GetRace_Call) Return(_a0 dal.Race, _a1 error) *MockQuerier_GetRace_Call {
+func (_c *MockQuerier_GetRaceById_Call) Return(_a0 dal.Race, _a1 error) *MockQuerier_GetRaceById_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockQuerier_GetRace_Call) RunAndReturn(run func(context.Context, int32) (dal.Race, error)) *MockQuerier_GetRace_Call {
+func (_c *MockQuerier_GetRaceById_Call) RunAndReturn(run func(context.Context, int32) (dal.Race, error)) *MockQuerier_GetRaceById_Call {
 	_c.Call.Return(run)
 	return _c
 }

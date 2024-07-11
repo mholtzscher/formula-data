@@ -36,6 +36,12 @@ service FormulaDataService {
       body: "*"
     };
   }
+  rpc CreateRace(CreateRaceRequest) returns (CreateRaceResponse) {
+    option (google.api.http) = {
+      post: "/v1/races",
+      body: "*"
+    };
+  }
 }
 
 message CreateSeasonRequest {
@@ -106,4 +112,31 @@ message CreateTeamRequest {
 
 message CreateTeamResponse {
   int32 team_id = 1;
+}
+
+message CreateRaceRequest {
+  option (buf.validate.message).cel = {
+    id: "create_race_year",
+    message: "the date of race must have year",
+    expression: "has(this.date.year)"
+  };
+  option (buf.validate.message).cel = {
+    id: "create_race_month",
+    message: "the date of race must have month",
+    expression: "has(this.date.month)"
+  };
+  option (buf.validate.message).cel = {
+    id: "create_race_day",
+    message: "the date of race must have day",
+    expression: "has(this.date.day)"
+  };
+
+  int32 season_id = 1 [(buf.validate.field).int32 = {gt: 0}];
+  string name = 2 [(buf.validate.field).required = true];
+  string location = 3 [(buf.validate.field).required = true];
+  google.type.Date date = 4 [(buf.validate.field).required = true];
+}
+
+message CreateRaceResponse {
+  int32 race_id = 1;
 }

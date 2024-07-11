@@ -7,22 +7,52 @@ package dal
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getRace = `-- name: GetRace :one
-SELECT id, season_id, race_name, location, race_date FROM race
+const createRace = `-- name: CreateRace :one
+INSERT INTO race
+(season_id, name, location, date)
+VALUES (
+$1, $2, $3, $4
+)
+RETURNING id
+`
+
+type CreateRaceParams struct {
+	SeasonID int32
+	Name     string
+	Location string
+	Date     pgtype.Date
+}
+
+func (q *Queries) CreateRace(ctx context.Context, arg CreateRaceParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createRace,
+		arg.SeasonID,
+		arg.Name,
+		arg.Location,
+		arg.Date,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getRaceById = `-- name: GetRaceById :one
+SELECT id, season_id, name, location, date FROM race
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetRace(ctx context.Context, id int32) (Race, error) {
-	row := q.db.QueryRow(ctx, getRace, id)
+func (q *Queries) GetRaceById(ctx context.Context, id int32) (Race, error) {
+	row := q.db.QueryRow(ctx, getRaceById, id)
 	var i Race
 	err := row.Scan(
 		&i.ID,
 		&i.SeasonID,
-		&i.RaceName,
+		&i.Name,
 		&i.Location,
-		&i.RaceDate,
+		&i.Date,
 	)
 	return i, err
 }
