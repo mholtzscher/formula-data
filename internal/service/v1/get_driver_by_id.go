@@ -15,7 +15,7 @@ func (s *FormulaDataServer) GetDriverById(
 ) (*connect.Response[apiv1.GetDriverByIdResponse], error) {
 	driver, err := s.DB.GetDriverById(ctx, request.Msg.DriverId)
 	if err != nil {
-		log.Error().Err(err).Msg("failed to get season by id")
+		log.Error().Err(err).Msg("failed to get driver by id")
 		return nil, mapPgErrorsToReturnCodes(err)
 	}
 	return &connect.Response[apiv1.GetDriverByIdResponse]{

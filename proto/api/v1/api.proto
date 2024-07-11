@@ -42,6 +42,9 @@ service FormulaDataService {
       body: "*"
     };
   }
+  rpc GetRaceById(GetRaceByIdRequest) returns (GetRaceByIdResponse) {
+    option (google.api.http) = {get: "/v1/races/{race_id}"};
+  }
 }
 
 message CreateSeasonRequest {
@@ -139,4 +142,12 @@ message CreateRaceRequest {
 
 message CreateRaceResponse {
   int32 race_id = 1;
+}
+
+message GetRaceByIdRequest {
+  int32 race_id = 1 [(buf.validate.field).int32 = {gt: 0}];
+}
+
+message GetRaceByIdResponse {
+  Race race = 1;
 }
