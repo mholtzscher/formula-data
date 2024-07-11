@@ -45,6 +45,12 @@ service FormulaDataService {
   rpc GetRaceById(GetRaceByIdRequest) returns (GetRaceByIdResponse) {
     option (google.api.http) = {get: "/v1/races/{race_id}"};
   }
+  rpc CreateResult(CreateResultRequest) returns (CreateResultResponse) {
+    option (google.api.http) = {
+      post: "/v1/results",
+      body: "*"
+    };
+  }
 }
 
 message CreateSeasonRequest {
@@ -150,4 +156,22 @@ message GetRaceByIdRequest {
 
 message GetRaceByIdResponse {
   Race race = 1;
+}
+
+message CreateResultRequest {
+  int32 race_id = 1 [(buf.validate.field).int32 = {gt: 0}];
+  int32 driver_id = 2 [(buf.validate.field).int32 = {gt: 0}];
+  int32 team_id = 3 [(buf.validate.field).int32 = {gt: 0}];
+  int32 position = 4 [(buf.validate.field).int32 = {
+    gt: 0,
+    lte: 20
+  }];
+  double points = 5 [(buf.validate.field).double = {
+    gte: 0.0,
+    lte: 26.0,
+  }];
+}
+
+message CreateResultResponse {
+  int32 result_id = 1;
 }

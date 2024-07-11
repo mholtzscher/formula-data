@@ -57,6 +57,9 @@ const (
 	// FormulaDataServiceGetRaceByIdProcedure is the fully-qualified name of the FormulaDataService's
 	// GetRaceById RPC.
 	FormulaDataServiceGetRaceByIdProcedure = "/api.v1.FormulaDataService/GetRaceById"
+	// FormulaDataServiceCreateResultProcedure is the fully-qualified name of the FormulaDataService's
+	// CreateResult RPC.
+	FormulaDataServiceCreateResultProcedure = "/api.v1.FormulaDataService/CreateResult"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -70,6 +73,7 @@ var (
 	formulaDataServiceCreateTeamMethodDescriptor    = formulaDataServiceServiceDescriptor.Methods().ByName("CreateTeam")
 	formulaDataServiceCreateRaceMethodDescriptor    = formulaDataServiceServiceDescriptor.Methods().ByName("CreateRace")
 	formulaDataServiceGetRaceByIdMethodDescriptor   = formulaDataServiceServiceDescriptor.Methods().ByName("GetRaceById")
+	formulaDataServiceCreateResultMethodDescriptor  = formulaDataServiceServiceDescriptor.Methods().ByName("CreateResult")
 )
 
 // FormulaDataServiceClient is a client for the api.v1.FormulaDataService service.
@@ -82,6 +86,7 @@ type FormulaDataServiceClient interface {
 	CreateTeam(context.Context, *connect.Request[v1.CreateTeamRequest]) (*connect.Response[v1.CreateTeamResponse], error)
 	CreateRace(context.Context, *connect.Request[v1.CreateRaceRequest]) (*connect.Response[v1.CreateRaceResponse], error)
 	GetRaceById(context.Context, *connect.Request[v1.GetRaceByIdRequest]) (*connect.Response[v1.GetRaceByIdResponse], error)
+	CreateResult(context.Context, *connect.Request[v1.CreateResultRequest]) (*connect.Response[v1.CreateResultResponse], error)
 }
 
 // NewFormulaDataServiceClient constructs a client for the api.v1.FormulaDataService service. By
@@ -142,6 +147,12 @@ func NewFormulaDataServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(formulaDataServiceGetRaceByIdMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		createResult: connect.NewClient[v1.CreateResultRequest, v1.CreateResultResponse](
+			httpClient,
+			baseURL+FormulaDataServiceCreateResultProcedure,
+			connect.WithSchema(formulaDataServiceCreateResultMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -155,6 +166,7 @@ type formulaDataServiceClient struct {
 	createTeam    *connect.Client[v1.CreateTeamRequest, v1.CreateTeamResponse]
 	createRace    *connect.Client[v1.CreateRaceRequest, v1.CreateRaceResponse]
 	getRaceById   *connect.Client[v1.GetRaceByIdRequest, v1.GetRaceByIdResponse]
+	createResult  *connect.Client[v1.CreateResultRequest, v1.CreateResultResponse]
 }
 
 // CreateSeason calls api.v1.FormulaDataService.CreateSeason.
@@ -197,6 +209,11 @@ func (c *formulaDataServiceClient) GetRaceById(ctx context.Context, req *connect
 	return c.getRaceById.CallUnary(ctx, req)
 }
 
+// CreateResult calls api.v1.FormulaDataService.CreateResult.
+func (c *formulaDataServiceClient) CreateResult(ctx context.Context, req *connect.Request[v1.CreateResultRequest]) (*connect.Response[v1.CreateResultResponse], error) {
+	return c.createResult.CallUnary(ctx, req)
+}
+
 // FormulaDataServiceHandler is an implementation of the api.v1.FormulaDataService service.
 type FormulaDataServiceHandler interface {
 	CreateSeason(context.Context, *connect.Request[v1.CreateSeasonRequest]) (*connect.Response[v1.CreateSeasonResponse], error)
@@ -207,6 +224,7 @@ type FormulaDataServiceHandler interface {
 	CreateTeam(context.Context, *connect.Request[v1.CreateTeamRequest]) (*connect.Response[v1.CreateTeamResponse], error)
 	CreateRace(context.Context, *connect.Request[v1.CreateRaceRequest]) (*connect.Response[v1.CreateRaceResponse], error)
 	GetRaceById(context.Context, *connect.Request[v1.GetRaceByIdRequest]) (*connect.Response[v1.GetRaceByIdResponse], error)
+	CreateResult(context.Context, *connect.Request[v1.CreateResultRequest]) (*connect.Response[v1.CreateResultResponse], error)
 }
 
 // NewFormulaDataServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -263,6 +281,12 @@ func NewFormulaDataServiceHandler(svc FormulaDataServiceHandler, opts ...connect
 		connect.WithSchema(formulaDataServiceGetRaceByIdMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	formulaDataServiceCreateResultHandler := connect.NewUnaryHandler(
+		FormulaDataServiceCreateResultProcedure,
+		svc.CreateResult,
+		connect.WithSchema(formulaDataServiceCreateResultMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/api.v1.FormulaDataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case FormulaDataServiceCreateSeasonProcedure:
@@ -281,6 +305,8 @@ func NewFormulaDataServiceHandler(svc FormulaDataServiceHandler, opts ...connect
 			formulaDataServiceCreateRaceHandler.ServeHTTP(w, r)
 		case FormulaDataServiceGetRaceByIdProcedure:
 			formulaDataServiceGetRaceByIdHandler.ServeHTTP(w, r)
+		case FormulaDataServiceCreateResultProcedure:
+			formulaDataServiceCreateResultHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -320,4 +346,8 @@ func (UnimplementedFormulaDataServiceHandler) CreateRace(context.Context, *conne
 
 func (UnimplementedFormulaDataServiceHandler) GetRaceById(context.Context, *connect.Request[v1.GetRaceByIdRequest]) (*connect.Response[v1.GetRaceByIdResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.FormulaDataService.GetRaceById is not implemented"))
+}
+
+func (UnimplementedFormulaDataServiceHandler) CreateResult(context.Context, *connect.Request[v1.CreateResultRequest]) (*connect.Response[v1.CreateResultResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.FormulaDataService.CreateResult is not implemented"))
 }

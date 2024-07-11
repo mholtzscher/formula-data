@@ -9,13 +9,43 @@ import (
 	"context"
 )
 
-const getResult = `-- name: GetResult :one
+const createResult = `-- name: CreateResult :one
+INSERT INTO result 
+(race_id, driver_id, team_id, position, points)
+VALUES (
+$1, $2, $3, $4, $5
+)
+RETURNING id
+`
+
+type CreateResultParams struct {
+	RaceID   int32
+	DriverID int32
+	TeamID   int32
+	Position int32
+	Points   float64
+}
+
+func (q *Queries) CreateResult(ctx context.Context, arg CreateResultParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createResult,
+		arg.RaceID,
+		arg.DriverID,
+		arg.TeamID,
+		arg.Position,
+		arg.Points,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getResultById = `-- name: GetResultById :one
 SELECT id, race_id, driver_id, team_id, position, points FROM result
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetResult(ctx context.Context, id int32) (Result, error) {
-	row := q.db.QueryRow(ctx, getResult, id)
+func (q *Queries) GetResultById(ctx context.Context, id int32) (Result, error) {
+	row := q.db.QueryRow(ctx, getResultById, id)
 	var i Result
 	err := row.Scan(
 		&i.ID,
