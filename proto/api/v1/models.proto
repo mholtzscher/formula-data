@@ -39,5 +39,5 @@ message Result {
   int32 driver_id = 3;
   int32 team_id = 4;
   int32 position = 5;
-  int32 points = 6;
+  double points = 6;
 }
