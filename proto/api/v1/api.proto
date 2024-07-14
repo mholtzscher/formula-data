@@ -54,6 +54,9 @@ service FormulaDataService {
   rpc GetResultById(GetResultByIdRequest) returns (GetResultByIdResponse) {
     option (google.api.http) = {get: "v1/results/{result_id}"};
   }
+  rpc GetResultsByRace(GetResultsByRaceRequest) returns (GetResultsByRaceResponse) {
+    option (google.api.http) = {get: "v1/results/race/{race_id}"};
+  }
 }
 
 message CreateSeasonRequest {
@@ -185,4 +188,12 @@ message GetResultByIdRequest {
 
 message GetResultByIdResponse {
   Result result = 1;
+}
+
+message GetResultsByRaceRequest {
+  int32 race_id = 1 [(buf.validate.field).int32 = {gt: 0}];
+}
+
+message GetResultsByRaceResponse {
+  repeated Result results = 1;
 }

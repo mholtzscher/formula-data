@@ -536,6 +536,65 @@ func (_c *MockQuerier_GetResultById_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
+// GetResultsByRaceId provides a mock function with given fields: ctx, raceID
+func (_m *MockQuerier) GetResultsByRaceId(ctx context.Context, raceID int32) ([]dal.Result, error) {
+	ret := _m.Called(ctx, raceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetResultsByRaceId")
+	}
+
+	var r0 []dal.Result
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int32) ([]dal.Result, error)); ok {
+		return rf(ctx, raceID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int32) []dal.Result); ok {
+		r0 = rf(ctx, raceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]dal.Result)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int32) error); ok {
+		r1 = rf(ctx, raceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockQuerier_GetResultsByRaceId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetResultsByRaceId'
+type MockQuerier_GetResultsByRaceId_Call struct {
+	*mock.Call
+}
+
+// GetResultsByRaceId is a helper method to define mock.On call
+//   - ctx context.Context
+//   - raceID int32
+func (_e *MockQuerier_Expecter) GetResultsByRaceId(ctx interface{}, raceID interface{}) *MockQuerier_GetResultsByRaceId_Call {
+	return &MockQuerier_GetResultsByRaceId_Call{Call: _e.mock.On("GetResultsByRaceId", ctx, raceID)}
+}
+
+func (_c *MockQuerier_GetResultsByRaceId_Call) Run(run func(ctx context.Context, raceID int32)) *MockQuerier_GetResultsByRaceId_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int32))
+	})
+	return _c
+}
+
+func (_c *MockQuerier_GetResultsByRaceId_Call) Return(_a0 []dal.Result, _a1 error) *MockQuerier_GetResultsByRaceId_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockQuerier_GetResultsByRaceId_Call) RunAndReturn(run func(context.Context, int32) ([]dal.Result, error)) *MockQuerier_GetResultsByRaceId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetSeasonById provides a mock function with given fields: ctx, id
 func (_m *MockQuerier) GetSeasonById(ctx context.Context, id int32) (dal.Season, error) {
 	ret := _m.Called(ctx, id)

@@ -57,3 +57,36 @@ func (q *Queries) GetResultById(ctx context.Context, id int32) (Result, error) {
 	)
 	return i, err
 }
+
+const getResultsByRaceId = `-- name: GetResultsByRaceId :many
+SELECT id, race_id, driver_id, team_id, position, points FROM result
+WHERE race_id = $1
+ORDER BY position ASC
+`
+
+func (q *Queries) GetResultsByRaceId(ctx context.Context, raceID int32) ([]Result, error) {
+	rows, err := q.db.Query(ctx, getResultsByRaceId, raceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Result
+	for rows.Next() {
+		var i Result
+		if err := rows.Scan(
+			&i.ID,
+			&i.RaceID,
+			&i.DriverID,
+			&i.TeamID,
+			&i.Position,
+			&i.Points,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

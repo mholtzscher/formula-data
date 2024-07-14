@@ -285,3 +285,83 @@ func TestGetResultById(t *testing.T) {
 		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 	})
 }
+
+func TestGetResultsByRace(t *testing.T) {
+	helper := CreateIntegrationTestHelper(t)
+	client := helper.Client
+
+	season, _ := client.CreateSeason(context.Background(), connect.NewRequest(&apiv1.CreateSeasonRequest{
+		Year:   int32(gofakeit.IntRange(1900, 2100)),
+		Series: gofakeit.BookAuthor(),
+	}))
+
+	d := gofakeit.Date()
+	race, _ := client.CreateRace(context.Background(), connect.NewRequest(&apiv1.CreateRaceRequest{
+		SeasonId: season.Msg.SeasonId,
+		Name:     gofakeit.FarmAnimal(),
+		Location: gofakeit.City(),
+		Date:     &date.Date{Year: int32(d.Year()), Month: int32(d.Month()), Day: int32(d.Day())},
+	}))
+
+	driver, _ := client.CreateDriver(context.Background(), connect.NewRequest(&apiv1.CreateDriverRequest{
+		FirstName:    gofakeit.FirstName(),
+		LastName:     gofakeit.LastName(),
+		PlaceOfBirth: gofakeit.City(),
+		DateOfBirth: &date.Date{
+			Year:  int32(d.Year()),
+			Month: int32(d.Month()),
+			Day:   int32(d.Day()),
+		},
+	}))
+
+	team, _ := client.CreateTeam(context.Background(), connect.NewRequest(&apiv1.CreateTeamRequest{
+		Name: gofakeit.Company(),
+		Base: gofakeit.Country(),
+	}))
+
+	t.Run("should return race results when querying by race", func(t *testing.T) {
+		request := &apiv1.CreateResultRequest{
+			RaceId:   race.Msg.RaceId,
+			DriverId: driver.Msg.DriverId,
+			TeamId:   team.Msg.TeamId,
+			Position: 1,
+			Points:   25,
+		}
+		result, err := client.CreateResult(context.Background(), connect.NewRequest(request))
+		assert.Nil(t, err)
+		assert.NotNil(t, result.Msg.ResultId)
+
+		actual, err := client.GetResultsByRace(context.Background(), connect.NewRequest(&apiv1.GetResultsByRaceRequest{
+			RaceId: race.Msg.RaceId,
+		}))
+		assert.Nil(t, err)
+		assert.Len(t, actual.Msg.Results, 1)
+		assert.Equal(t, request.RaceId, actual.Msg.Results[0].RaceId)
+		assert.Equal(t, request.DriverId, actual.Msg.Results[0].DriverId)
+		assert.Equal(t, request.TeamId, actual.Msg.Results[0].TeamId)
+		assert.Equal(t, request.Position, actual.Msg.Results[0].Position)
+		assert.Equal(t, request.Points, actual.Msg.Results[0].Points)
+	})
+
+	t.Run("should return not found when race id does not exist", func(t *testing.T) {
+		actual, err := client.GetResultsByRace(context.Background(), connect.NewRequest(&apiv1.GetResultsByRaceRequest{
+			RaceId: 100,
+		}))
+		assert.Nil(t, err)
+		assert.Len(t, actual.Msg.Results, 0)
+	})
+
+	t.Run("race id should be greater than 0", func(t *testing.T) {
+		_, err := client.GetResultsByRace(context.Background(), connect.NewRequest(&apiv1.GetResultsByRaceRequest{
+			RaceId: -1,
+		}))
+		assert.NotNil(t, err)
+		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	})
+
+	t.Run("should return validation error when id is not in request", func(t *testing.T) {
+		_, err := client.GetResultsByRace(context.Background(), connect.NewRequest(&apiv1.GetResultsByRaceRequest{}))
+		assert.NotNil(t, err)
+		assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	})
+}

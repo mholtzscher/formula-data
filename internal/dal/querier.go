@@ -18,6 +18,7 @@ type Querier interface {
 	GetDriverById(ctx context.Context, id int32) (Driver, error)
 	GetRaceById(ctx context.Context, id int32) (Race, error)
 	GetResultById(ctx context.Context, id int32) (Result, error)
+	GetResultsByRaceId(ctx context.Context, raceID int32) ([]Result, error)
 	GetSeasonById(ctx context.Context, id int32) (Season, error)
 	GetTeamById(ctx context.Context, id int32) (Team, error)
 }
