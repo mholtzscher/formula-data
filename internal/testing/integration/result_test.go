@@ -343,7 +343,7 @@ func TestGetResultsByRace(t *testing.T) {
 		assert.Equal(t, request.Points, actual.Msg.Results[0].Points)
 	})
 
-	t.Run("should return not found when race id does not exist", func(t *testing.T) {
+	t.Run("should return no results when race id does not exist", func(t *testing.T) {
 		actual, err := client.GetResultsByRace(context.Background(), connect.NewRequest(&apiv1.GetResultsByRaceRequest{
 			RaceId: 100,
 		}))
