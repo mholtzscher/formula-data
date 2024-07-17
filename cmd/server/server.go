@@ -39,6 +39,7 @@ func main() {
 	err := ff.Parse(fs, os.Args[1:],
 		ff.WithEnvVarPrefix("FORMULA_DATA"),
 		ff.WithConfigFile(".env"),
+		ff.WithAllowMissingConfigFile(true),
 		ff.WithConfigFileParser(ff.EnvParser),
 	)
 	if err != nil {
