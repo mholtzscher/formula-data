@@ -38,6 +38,9 @@ jobs:
           go-version-file: "go.mod"
           check-latest: true
 
+      - name: Run tests
+        run: go test -v ./...
+
       - uses: ko-build/setup-ko@v0.6
 
       - name: Build Tagged Image
