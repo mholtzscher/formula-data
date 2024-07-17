@@ -35,6 +35,7 @@ func main() {
 		dbUser     = fs.String("db-user", "postgres", "database user")
 		dbPass     = fs.String("db-pass", "postgres", "database password")
 		dbName     = fs.String("db-name", "formula-data", "database name")
+		dbSslMode  = fs.String("db-sslmode", "prefer", "database sslmode")
 	)
 	err := ff.Parse(fs, os.Args[1:],
 		ff.WithEnvVarPrefix("FORMULA_DATA"),
@@ -51,7 +52,7 @@ func main() {
 	ctx := context.Background()
 
 	log.Info().Str("host", *dbHost).Str("user", *dbUser).Msg("connecting to database")
-	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s", *dbHost, *dbUser, *dbPass, *dbName)
+	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s", *dbHost, *dbUser, *dbPass, *dbName, *dbSslMode)
 	conn, err := pgx.Connect(ctx, connString)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not connect to database")

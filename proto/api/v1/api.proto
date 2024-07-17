@@ -52,10 +52,10 @@ service FormulaDataService {
     };
   }
   rpc GetResultById(GetResultByIdRequest) returns (GetResultByIdResponse) {
-    option (google.api.http) = {get: "v1/results/{result_id}"};
+    option (google.api.http) = {get: "/v1/results/{result_id}"};
   }
   rpc GetResultsByRace(GetResultsByRaceRequest) returns (GetResultsByRaceResponse) {
-    option (google.api.http) = {get: "v1/results/race/{race_id}"};
+    option (google.api.http) = {get: "/v1/results/race/{race_id}"};
   }
 }
 
