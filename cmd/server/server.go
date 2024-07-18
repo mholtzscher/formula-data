@@ -57,6 +57,7 @@ func main() {
 	dbUrl := os.Getenv("DATABASE_URL")
 	if dbUrl != "" {
 		connString = dbUrl
+		log.Info().Msg("using DATABASE_URL for postgres connection")
 	}
 
 	conn, err := pgx.Connect(ctx, connString)
