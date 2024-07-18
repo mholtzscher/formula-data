@@ -66,6 +66,7 @@ func main() {
 	}
 
 	if *runMigrations {
+		log.Info().Msg("running migrations")
 		err = runGooseMigrations(connString)
 		if err != nil {
 			log.Fatal().Err(err).Msg("could not run migrations")
