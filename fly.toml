@@ -1,0 +1,31 @@
+# fly.toml app configuration file generated for formula-data on 2024-07-17T21:28:59-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'formula-data'
+primary_region = 'dfw'
+
+[build]
+image = "ghcr.io/mholtzscher/formula-data:latest"
+
+[env]
+FORMULA_DATA_LISTEN_ADDR = "0.0.0.0:8080"
+
+# [deploy]
+# strategy = "bluegreen"
+
+[http_service]
+internal_port = 8080
+force_https = true
+auto_stop_machines = true
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
+
+[http_service.http_options]
+h2_backend = true
+
+
+[[vm]]
+size = 'shared-cpu-1x'
