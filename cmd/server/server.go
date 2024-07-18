@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
@@ -16,10 +17,13 @@ import (
 	"connectrpc.com/validate"
 	"connectrpc.com/vanguard"
 	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	formuladata "github.com/mholtzscher/formula-data"
 	"github.com/mholtzscher/formula-data/gen/api/v1/apiv1connect"
 	"github.com/mholtzscher/formula-data/internal/dal"
 	srvV1 "github.com/mholtzscher/formula-data/internal/service/v1"
 	"github.com/peterbourgon/ff/v3"
+	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/http2"
@@ -29,13 +33,14 @@ import (
 func main() {
 	fs := flag.NewFlagSet("formula-data", flag.ContinueOnError)
 	var (
-		listenAddr = fs.String("listen-addr", "localhost:8080", "listen address")
-		logLevel   = fs.String("log-level", "info", "log level")
-		dbHost     = fs.String("db-host", "localhost", "database host")
-		dbUser     = fs.String("db-user", "postgres", "database user")
-		dbPass     = fs.String("db-pass", "postgres", "database password")
-		dbName     = fs.String("db-name", "formula-data", "database name")
-		dbSslMode  = fs.String("db-sslmode", "prefer", "database sslmode")
+		listenAddr    = fs.String("listen-addr", "localhost:8080", "listen address")
+		logLevel      = fs.String("log-level", "info", "log level")
+		dbHost        = fs.String("db-host", "localhost", "database host")
+		dbUser        = fs.String("db-user", "postgres", "database user")
+		dbPass        = fs.String("db-pass", "postgres", "database password")
+		dbName        = fs.String("db-name", "formula-data", "database name")
+		dbSslMode     = fs.String("db-sslmode", "prefer", "database sslmode")
+		runMigrations = fs.Bool("run-migrations", false, "run database migrations")
 	)
 	err := ff.Parse(fs, os.Args[1:],
 		ff.WithEnvVarPrefix("FORMULA_DATA"),
@@ -58,6 +63,14 @@ func main() {
 	if dbUrl != "" {
 		connString = dbUrl
 		log.Info().Msg("using DATABASE_URL for postgres connection")
+	}
+
+	if *runMigrations {
+		err = runGooseMigrations(connString)
+		if err != nil {
+			log.Fatal().Err(err).Msg("could not run migrations")
+		}
+		return
 	}
 
 	conn, err := pgx.Connect(ctx, connString)
@@ -133,4 +146,22 @@ func setupLogging(logLevel string) {
 	case "panic":
 		zerolog.SetGlobalLevel(zerolog.PanicLevel)
 	}
+}
+
+func runGooseMigrations(connString string) error {
+	goose.SetBaseFS(formuladata.MigrationsFileSystem)
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		return err
+	}
+
+	db, err := sql.Open("pgx", connString)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	if err := goose.Up(db, "sql/migrations"); err != nil {
+		return err
+	}
+	return err
 }
