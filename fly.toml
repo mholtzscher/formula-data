@@ -13,7 +13,7 @@ image = "ghcr.io/mholtzscher/formula-data:latest"
 FORMULA_DATA_LISTEN_ADDR = "0.0.0.0:8080"
 
 [deploy]
-release_command = "/ko-app/server -run-migrations"
+release_command = "-run-migrations"
 # strategy = "bluegreen"
 
 [http_service]
