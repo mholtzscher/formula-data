@@ -1,4 +1,4 @@
-name: Image-Builder
+name: Build And Deploy
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   image-builder:
-    name: Build multi-arch image
+    name: Build And Deploy
     runs-on: ubuntu-latest
     env:
       KO_DOCKER_REPO: ghcr.io/mholtzscher/formula-data
@@ -47,3 +47,11 @@ jobs:
         run: |
           echo "Building image with tag: ${{ steps.get_image_tag.outputs.image_tag }}"
           ko build --platform=linux/arm64,linux/amd64 --bare --tags=${{ steps.get_image_tag.outputs.image_tag }},latest cmd/server/server.go
+
+      - name: setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: deploy
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
