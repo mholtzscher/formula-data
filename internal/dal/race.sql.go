@@ -7,52 +7,55 @@ package dal
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
-
-const createRace = `-- name: CreateRace :one
-INSERT INTO race
-(season_id, name, location, date)
-VALUES (
-$1, $2, $3, $4
-)
-RETURNING id
-`
-
-type CreateRaceParams struct {
-	SeasonID int32
-	Name     string
-	Location string
-	Date     pgtype.Date
-}
-
-func (q *Queries) CreateRace(ctx context.Context, arg CreateRaceParams) (int32, error) {
-	row := q.db.QueryRow(ctx, createRace,
-		arg.SeasonID,
-		arg.Name,
-		arg.Location,
-		arg.Date,
-	)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
-}
 
 const getRaceById = `-- name: GetRaceById :one
-SELECT id, season_id, name, location, date FROM race
-WHERE id = $1 LIMIT 1
+SELECT id, year, round, date, time, grand_prix_id, official_name, qualifying_format, sprint_qualifying_format, circuit_id, circuit_type, course_length, laps, distance, scheduled_laps, scheduled_distance, pre_qualifying_date, pre_qualifying_time, free_practice_1_date, free_practice_1_time, free_practice_2_date, free_practice_2_time, free_practice_3_date, free_practice_3_time, free_practice_4_date, free_practice_4_time, qualifying_1_date, qualifying_1_time, qualifying_2_date, qualifying_2_time, qualifying_date, qualifying_time, sprint_qualifying_date, sprint_qualifying_time, sprint_race_date, sprint_race_time, warming_up_date, warming_up_time FROM race
+WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetRaceById(ctx context.Context, id int32) (Race, error) {
-	row := q.db.QueryRow(ctx, getRaceById, id)
+func (q *Queries) GetRaceById(ctx context.Context, id int64) (Race, error) {
+	row := q.db.QueryRowContext(ctx, getRaceById, id)
 	var i Race
 	err := row.Scan(
 		&i.ID,
-		&i.SeasonID,
-		&i.Name,
-		&i.Location,
+		&i.Year,
+		&i.Round,
 		&i.Date,
+		&i.Time,
+		&i.GrandPrixID,
+		&i.OfficialName,
+		&i.QualifyingFormat,
+		&i.SprintQualifyingFormat,
+		&i.CircuitID,
+		&i.CircuitType,
+		&i.CourseLength,
+		&i.Laps,
+		&i.Distance,
+		&i.ScheduledLaps,
+		&i.ScheduledDistance,
+		&i.PreQualifyingDate,
+		&i.PreQualifyingTime,
+		&i.FreePractice1Date,
+		&i.FreePractice1Time,
+		&i.FreePractice2Date,
+		&i.FreePractice2Time,
+		&i.FreePractice3Date,
+		&i.FreePractice3Time,
+		&i.FreePractice4Date,
+		&i.FreePractice4Time,
+		&i.Qualifying1Date,
+		&i.Qualifying1Time,
+		&i.Qualifying2Date,
+		&i.Qualifying2Time,
+		&i.QualifyingDate,
+		&i.QualifyingTime,
+		&i.SprintQualifyingDate,
+		&i.SprintQualifyingTime,
+		&i.SprintRaceDate,
+		&i.SprintRaceTime,
+		&i.WarmingUpDate,
+		&i.WarmingUpTime,
 	)
 	return i, err
 }

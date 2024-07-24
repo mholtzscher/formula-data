@@ -1,11 +1,10 @@
 version: "2"
 sql:
-  - engine: "postgresql"
+  - engine: "sqlite"
     queries: "sql/queries"
-    schema: "sql/migrations"
+    schema: "sql/schema"
     gen:
       go:
         package: "dal"
         out: "internal/dal"
-        sql_package: "pgx/v5"
         emit_interface: true

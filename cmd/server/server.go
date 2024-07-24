@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,14 +15,11 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"
 	"connectrpc.com/vanguard"
-	"github.com/jackc/pgx/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	formuladata "github.com/mholtzscher/formula-data"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/mholtzscher/formula-data/gen/api/v1/apiv1connect"
 	"github.com/mholtzscher/formula-data/internal/dal"
 	srvV1 "github.com/mholtzscher/formula-data/internal/service/v1"
 	"github.com/peterbourgon/ff/v3"
-	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/net/http2"
@@ -33,14 +29,9 @@ import (
 func main() {
 	fs := flag.NewFlagSet("formula-data", flag.ContinueOnError)
 	var (
-		listenAddr    = fs.String("listen-addr", "localhost:8080", "listen address")
-		logLevel      = fs.String("log-level", "info", "log level")
-		dbHost        = fs.String("db-host", "localhost", "database host")
-		dbUser        = fs.String("db-user", "postgres", "database user")
-		dbPass        = fs.String("db-pass", "postgres", "database password")
-		dbName        = fs.String("db-name", "formula-data", "database name")
-		dbSslMode     = fs.String("db-sslmode", "prefer", "database sslmode")
-		runMigrations = fs.Bool("run-migrations", false, "run database migrations")
+		listenAddr = fs.String("listen-addr", "localhost:8080", "listen address")
+		logLevel   = fs.String("log-level", "info", "log level")
+		dbFile     = fs.String("db-file", "f1db.db", "database file")
 	)
 	err := ff.Parse(fs, os.Args[1:],
 		ff.WithEnvVarPrefix("FORMULA_DATA"),
@@ -54,34 +45,14 @@ func main() {
 
 	setupLogging(*logLevel)
 
-	ctx := context.Background()
-
-	log.Info().Str("host", *dbHost).Str("user", *dbUser).Msg("connecting to database")
-	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s", *dbHost, *dbUser, *dbPass, *dbName, *dbSslMode)
-
-	dbUrl := os.Getenv("DATABASE_URL")
-	if dbUrl != "" {
-		connString = dbUrl
-		log.Info().Msg("using DATABASE_URL for postgres connection")
-	}
-
-	if *runMigrations {
-		log.Info().Msg("running migrations")
-		err = runGooseMigrations(connString)
-		if err != nil {
-			log.Fatal().Err(err).Msg("could not run migrations")
-		}
-		return
-	}
-
-	conn, err := pgx.Connect(ctx, connString)
+	db, err := sql.Open("sqlite3", *dbFile)
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not connect to database")
+		log.Fatal().Err(err).Msg("could not open database")
 	}
-	defer conn.Close(ctx)
-	log.Info().Msg("connected to postgres database")
+	defer db.Close()
+	log.Info().Str("db-file", *dbFile).Msg("connected to sqlite database")
 
-	queries := dal.New(conn)
+	queries := dal.New(db)
 	fdServer := srvV1.NewFormulaDataServer(queries)
 
 	validator, err := validate.NewInterceptor()
@@ -147,22 +118,4 @@ func setupLogging(logLevel string) {
 	case "panic":
 		zerolog.SetGlobalLevel(zerolog.PanicLevel)
 	}
-}
-
-func runGooseMigrations(connString string) error {
-	goose.SetBaseFS(formuladata.MigrationsFileSystem)
-
-	if err := goose.SetDialect("postgres"); err != nil {
-		return err
-	}
-
-	db, err := sql.Open("pgx", connString)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	if err := goose.Up(db, "sql/migrations"); err != nil {
-		return err
-	}
-	return err
 }

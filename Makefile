@@ -13,6 +13,7 @@ help:
 	@echo "  make migration-down"
 	@echo "  make migration-status"
 	@echo "  make sqlc-gen"
+	@echo "  make mock-gen"
 	@echo "  make buf-gen"
 	@echo "  make run"
 
@@ -69,3 +70,18 @@ gen: buf-gen migration-up sqlc-gen mock-gen
 # Run all 
 .PHONY: all
 all: buf-gen migration-up sqlc-gen mock-gen run
+
+
+.PHONY: get-f1db-release
+get-f1db-release:
+	@if [ -z "$(tag)" ]; then echo "Please provide a release tag name like this: make get-f1db-release tag=your_tag"; exit 1; fi
+	rm -rf /tmp/f1db-$(tag)
+	mkdir -p /tmp/f1db-$(tag)
+	curl -Lo /tmp/f1db-$(tag)/f1db-sql-sqlite.zip https://github.com/f1db/f1db/releases/download/$(tag)/f1db-sql-sqlite.zip
+	unzip /tmp/f1db-$(tag)/f1db-sql-sqlite.zip -d /tmp/f1db-$(tag)/
+	$(eval CLEANED_TAG := $(shell echo $(tag) | tr -d 'a-zA-Z-.'))
+	sed '/^INSERT/d' /tmp/f1db-$(tag)/f1db-sql-sqlite.sql > ./sql/schema/$(CLEANED_TAG)-f1db-sql-sqlite.sql	
+	curl -Lo /tmp/f1db-$(tag)/f1db-sqlite.zip https://github.com/f1db/f1db/releases/download/$(tag)/f1db-sqlite.zip
+	unzip /tmp/f1db-$(tag)/f1db-sqlite.zip -d /tmp/f1db-$(tag)/
+	cp /tmp/f1db-$(tag)/f1db.db ./f1db.db
+
