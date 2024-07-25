@@ -22,34 +22,47 @@ import (
 	srvV1 "github.com/mholtzscher/formula-data/internal/service/v1"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/sethvargo/go-envconfig"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
 
+type Config struct {
+	Host     string `env:"HOST, default=localhost"`
+	Port     string `env:"PORT, default=8080"`
+	LogLevel string `env:"LOG_LEVEL, default=info"`
+	DbFile   string `env:"DB_FILE, default=f1db.db"`
+}
+
 func main() {
 	ctx := context.Background()
-	if err := run(ctx, os.Getenv); err != nil {
+	if err := run(ctx, envconfig.OsLookuper()); err != nil {
 		log.Fatal().Err(err).Msg("error running server")
 	}
 }
 
-func run(ctx context.Context, getEnv func(string) string) error {
+func run(ctx context.Context, envLookup envconfig.Lookuper) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	dbFile := getEnv("DB_FILE")
-	host := getEnv("HOST")
-	port := getEnv("PORT")
-	logLevel := getEnv("LOG_LEVEL")
+	var cfg Config
+	err := envconfig.ProcessWith(ctx, &envconfig.Config{
+		Target:   &cfg,
+		Lookuper: envLookup,
+	})
+	if err != nil {
+		return err
+	}
+	log.Info().Interface("config", cfg).Msg("loaded configuration")
 
-	setupLogging(logLevel)
+	setupLogging(cfg.LogLevel)
 
-	db, err := sql.Open("sqlite3", dbFile)
+	db, err := sql.Open("sqlite3", cfg.DbFile)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
-	log.Info().Str("db-file", dbFile).Msg("connected to sqlite database")
+	log.Info().Msg("connected to sqlite database")
 
 	queries := dal.New(db)
 	fdServer := srvV1.NewFormulaDataServer(queries)
@@ -71,7 +84,7 @@ func run(ctx context.Context, getEnv func(string) string) error {
 	}
 
 	srv := &http.Server{
-		Addr: net.JoinHostPort(host, port),
+		Addr: net.JoinHostPort(cfg.Host, cfg.Port),
 		Handler: h2c.NewHandler(
 			handler,
 			&http2.Server{},
