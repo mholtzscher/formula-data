@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -98,7 +97,7 @@ func run(ctx context.Context, envLookup envconfig.Lookuper) error {
 	go func() {
 		log.Info().Msg("starting server")
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			fmt.Fprintf(os.Stderr, "error listening and serving: %s\n", err)
+			log.Error().Err(err).Msg("error listening and serving")
 		}
 	}()
 
@@ -115,83 +114,9 @@ func run(ctx context.Context, envLookup envconfig.Lookuper) error {
 		}
 	}()
 	wg.Wait()
+	log.Info().Msg("shutdown complete")
 	return nil
 }
-
-// func main() {
-// 	fs := flag.NewFlagSet("formula-data", flag.ContinueOnError)
-// 	var (
-// 		listenAddr = fs.String("listen-addr", "localhost:8080", "listen address")
-// 		logLevel   = fs.String("log-level", "info", "log level")
-// 		dbFile     = fs.String("db-file", "f1db.db", "database file")
-// 	)
-// 	err := ff.Parse(fs, os.Args[1:],
-// 		ff.WithEnvVarPrefix("FORMULA_DATA"),
-// 		ff.WithConfigFile(".env"),
-// 		ff.WithAllowMissingConfigFile(true),
-// 		ff.WithConfigFileParser(ff.EnvParser),
-// 	)
-// 	if err != nil {
-// 		log.Fatal().Err(err).Msg("error parsing flags")
-// 	}
-//
-// 	setupLogging(*logLevel)
-//
-// 	db, err := sql.Open("sqlite3", *dbFile)
-// 	if err != nil {
-// 		log.Fatal().Err(err).Msg("could not open database")
-// 	}
-// 	defer db.Close()
-// 	log.Info().Str("db-file", *dbFile).Msg("connected to sqlite database")
-//
-// 	queries := dal.New(db)
-// 	fdServer := srvV1.NewFormulaDataServer(queries)
-//
-// 	validator, err := validate.NewInterceptor()
-// 	if err != nil {
-// 		log.Fatal().Err(err).Msg("could not create validation interceptor")
-// 	}
-//
-// 	service := vanguard.NewService(apiv1connect.NewFormulaDataServiceHandler(
-// 		fdServer,
-// 		connect.WithInterceptors(validator),
-// 	),
-// 	)
-//
-// 	handler, err := vanguard.NewTranscoder([]*vanguard.Service{service})
-// 	if err != nil {
-// 		log.Fatal().Err(err).Msg("could not create transcoder")
-// 	}
-//
-// 	srv := &http.Server{
-// 		Addr: *listenAddr,
-// 		Handler: h2c.NewHandler(
-// 			handler,
-// 			&http2.Server{},
-// 		),
-// 		ReadHeaderTimeout: time.Second,
-// 		ReadTimeout:       5 * time.Minute,
-// 		WriteTimeout:      5 * time.Minute,
-// 		MaxHeaderBytes:    8 * 1024, // 8KiB
-// 	}
-//
-// 	signals := make(chan os.Signal, 1)
-// 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
-// 	go func() {
-// 		log.Info().Msg("starting server")
-// 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-// 			log.Fatal().Msgf("HTTP listen and serve: %v", err)
-// 		}
-// 	}()
-//
-// 	<-signals
-// 	log.Info().Msg("shutting down server")
-// 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-// 	defer cancel()
-// 	if err := srv.Shutdown(ctx); err != nil {
-// 		log.Fatal().Msgf("HTTP shutdown: %v", err)
-// 	}
-// }
 
 func setupLogging(logLevel string) {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
