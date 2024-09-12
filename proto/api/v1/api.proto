@@ -11,49 +11,59 @@ option go_package = "github.com/mholtzscher/formula-data/gen/api/v1;apiv1";
 service FormulaDataService {
   rpc CreateSeason(CreateSeasonRequest) returns (CreateSeasonResponse) {
     option (google.api.http) = {
-      post: "/v1/seasons",
+      post: "/v1/seasons"
       body: "*"
     };
   }
+
   rpc GetSeasonById(GetSeasonByIdRequest) returns (GetSeasonByIdResponse) {
     option (google.api.http) = {get: "/v1/seasons/{season_id}"};
   }
+
   rpc GetAllSeasons(GetAllSeasonsRequest) returns (GetAllSeasonsResponse) {
     option (google.api.http) = {get: "/v1/seasons"};
   }
+
   rpc CreateDriver(CreateDriverRequest) returns (CreateDriverResponse) {
     option (google.api.http) = {
-      post: "/v1/drivers",
+      post: "/v1/drivers"
       body: "*"
     };
   }
+
   rpc GetDriverById(GetDriverByIdRequest) returns (GetDriverByIdResponse) {
     option (google.api.http) = {get: "/v1/drivers/{driver_id}"};
   }
+
   rpc CreateTeam(CreateTeamRequest) returns (CreateTeamResponse) {
     option (google.api.http) = {
-      post: "/v1/teams",
+      post: "/v1/teams"
       body: "*"
     };
   }
+
   rpc CreateRace(CreateRaceRequest) returns (CreateRaceResponse) {
     option (google.api.http) = {
-      post: "/v1/races",
+      post: "/v1/races"
       body: "*"
     };
   }
+
   rpc GetRaceById(GetRaceByIdRequest) returns (GetRaceByIdResponse) {
     option (google.api.http) = {get: "/v1/races/{race_id}"};
   }
+
   rpc CreateResult(CreateResultRequest) returns (CreateResultResponse) {
     option (google.api.http) = {
-      post: "/v1/results",
+      post: "/v1/results"
       body: "*"
     };
   }
+
   rpc GetResultById(GetResultByIdRequest) returns (GetResultByIdResponse) {
     option (google.api.http) = {get: "/v1/results/{result_id}"};
   }
+
   rpc GetResultsByRace(GetResultsByRaceRequest) returns (GetResultsByRaceResponse) {
     option (google.api.http) = {get: "/v1/results/race/{race_id}"};
   }
@@ -61,7 +71,7 @@ service FormulaDataService {
 
 message CreateSeasonRequest {
   int32 year = 1 [(buf.validate.field).int32 = {
-    gt: 1900,
+    gt: 1900
     lte: 2100
   }];
   string series = 2 [(buf.validate.field).required = true];
@@ -87,18 +97,18 @@ message GetAllSeasonsResponse {
 
 message CreateDriverRequest {
   option (buf.validate.message).cel = {
-    id: "create_driver_dob_year",
-    message: "the date of birth must have year",
+    id: "create_driver_dob_year"
+    message: "the date of birth must have year"
     expression: "has(this.date_of_birth.year)"
   };
   option (buf.validate.message).cel = {
-    id: "create_driver_dob_month",
-    message: "the date of birth must have month",
+    id: "create_driver_dob_month"
+    message: "the date of birth must have month"
     expression: "has(this.date_of_birth.month)"
   };
   option (buf.validate.message).cel = {
-    id: "create_driver_dob_day",
-    message: "the date of birth must have day",
+    id: "create_driver_dob_day"
+    message: "the date of birth must have day"
     expression: "has(this.date_of_birth.day)"
   };
 
@@ -131,18 +141,18 @@ message CreateTeamResponse {
 
 message CreateRaceRequest {
   option (buf.validate.message).cel = {
-    id: "create_race_year",
-    message: "the date of race must have year",
+    id: "create_race_year"
+    message: "the date of race must have year"
     expression: "has(this.date.year)"
   };
   option (buf.validate.message).cel = {
-    id: "create_race_month",
-    message: "the date of race must have month",
+    id: "create_race_month"
+    message: "the date of race must have month"
     expression: "has(this.date.month)"
   };
   option (buf.validate.message).cel = {
-    id: "create_race_day",
-    message: "the date of race must have day",
+    id: "create_race_day"
+    message: "the date of race must have day"
     expression: "has(this.date.day)"
   };
 
@@ -169,12 +179,12 @@ message CreateResultRequest {
   int32 driver_id = 2 [(buf.validate.field).int32 = {gt: 0}];
   int32 team_id = 3 [(buf.validate.field).int32 = {gt: 0}];
   int32 position = 4 [(buf.validate.field).int32 = {
-    gt: 0,
+    gt: 0
     lte: 20
   }];
   double points = 5 [(buf.validate.field).double = {
-    gte: 0.0,
-    lte: 26.0,
+    gte: 0.0
+    lte: 26.0
   }];
 }
 
